@@ -12,21 +12,25 @@ def initialize():
     SHEET= pygame.image.load("assets/spritesheet.png").convert_alpha()
     PROPSYS=ProportionalSystem(DEFS['width'], DEFS['height'])
     SPRITE_LOADER = spriteLoader()
+    global crt_texture,crt_overlay
+    crt_texture = pygame.image.load("assets/rgb.png").convert_alpha()
+    crt_texture.set_alpha(50)
+    crt_overlay = pygame.Surface((DEFS['width'], DEFS['height']), pygame.SRCALPHA)
+    crt_texture = pygame.transform.scale(crt_texture, (DEFS['crtsize'], DEFS['crtsize']))
     return SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER
-
 class TeeVee:
     def __init__(self):
         SPRITE_LOADER.create_sprite(
             key="frame",
             position=(0, 0),
             size=(22, 36),
-            scale=DEFS["width"]/150
+            scale=DEFS["width"]/100
         )
         SPRITE_LOADER.create_sprite(
             key="mouths",
             position=(0, 0),
             size=(22, 36),
-            scale=DEFS["width"]/150
+            scale=DEFS["width"]/100
         )
         self.emote = "happy"  # Exemplo de estado emocional
     def draw(self):
@@ -47,7 +51,19 @@ class TeeVee:
 
         return True
     
-        
+#sound player
+sounds={
+    'click': 'assets/sounds/click.mp3',
+    'talk': 'assets/sounds/talk.mp3',
+    'cancel' : 'assets/sounds/cancel.mp3',
+}
+def play_sound(sound):
+    """Toca um arquivo de som"""
+    if not os.path.isfile(sounds[sound]):
+        print(f"Arquivo de som não encontrado: {sounds[sound]}")
+        return
+    sound = pygame.mixer.Sound(sounds[sound])
+    sound.play()
 class ProportionalSystem:
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
@@ -91,9 +107,9 @@ class ProportionalSystem:
             self.percent_to_px_x(width_percent),
             self.percent_to_px_y(height_percent)
         )
-class Button:
+class UElement:
     def __init__(self, x_percent, y_percent, width_percent, height_percent, 
-                 text, color=(128, 128, 128), font_size_percent=0.1):
+                 text='', color=None,clickable=False, font_size_percent=0.1,outline_size=5):
         """
         Botão com coordenadas proporcionais
         
@@ -102,7 +118,6 @@ class Button:
             width_percent, height_percent: Tamanho em porcentagem (0.0 a 1.0)
             text: Texto do botão
             color: Cor normal do botão
-            hover_color: Cor quando o mouse está sobre
             font_size_percent: Tamanho da fonte em porcentagem da altura da tela
         """
         
@@ -111,17 +126,17 @@ class Button:
         y_px = PROPSYS.percent_to_px_y(y_percent)
         width_px = PROPSYS.percent_to_px_x(width_percent)
         height_px = PROPSYS.percent_to_px_y(height_percent)
-        
         self.rect = pygame.Rect(x_px, y_px, width_px, height_px)
         self.text = text
         self.color = color
-        self.current_color = color
+        self.clickable=clickable
         self.hovering=False
+        self.outline_size=outline_size
         
         # Tamanho da fonte proporcional
         font_size = int(PROPSYS.percent_to_px_y(font_size_percent))
         self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
-        self.text_surface = self.font.render(text, True, color)
+        self.text_surface = self.font.render(text, True, (255, 255, 255))
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         
         # Armazena as porcentagens para redimensionamento
@@ -133,18 +148,21 @@ class Button:
     
     def draw(self,screen):
         """Desenha o botão na superfície"""
-        pygame.draw.rect(screen, self.color, self.rect, 10,)
+        if self.color:
+            pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
         screen.blit(self.text_surface, self.text_rect)
     
     def update_font(self, scale=1):
         # Atualiza fonte
         font_size = int(PROPSYS.percent_to_px_y(self.font_size_percent*scale))
         self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
-        self.text_surface = self.font.render(self.text, True, self.color)
+        self.text_surface = self.font.render(self.text, True, (255, 255, 255))
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
     
     def check_hover(self, pos):
         """Verifica se o mouse está sobre o botão"""
+        if not self.clickable:
+            return False
         if self.rect.collidepoint(pos):
             self.hovering=True
             self.update_font(scale=1.2)
@@ -157,8 +175,11 @@ class Button:
     
     def is_clicked(self, pos, event):
         """Verifica se o botão foi clicado"""
+        if not self.clickable:
+            return False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(pos):
+                play_sound('click')
                 return True
         return False
     
@@ -233,3 +254,13 @@ class spriteLoader:
         
     def get_sprite(self, key):
         return self.sprites.get(key)
+def apply_crt_effect():
+    # Limpar a overlay
+    crt_overlay.fill((0, 0, 0, 0))
+    
+    # Aplicar a textura 16x16 repetidamente em toda a tela
+    
+    for y in range(0, int(DEFS['height']),int(DEFS['crtsize'])):
+        for x in range(0, int(DEFS['width']),int(DEFS['crtsize'])):
+            crt_overlay.blit(crt_texture, (x, y))
+    return crt_overlay
