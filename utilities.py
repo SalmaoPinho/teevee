@@ -32,7 +32,8 @@ class TeeVee:
             size=(22, 36),
             scale=DEFS["width"]/100
         )
-        self.emote = "happy"  # Exemplo de estado emocional
+        self.eyes = "open"  # Exemplo de estado dos olhos
+        self.mouth = "happy"  # Exemplo de estado emocional
     def draw(self):
         #frame
         SPRITE_LOADER.draw_sprite_centered("frame", DEFS['center_x'], DEFS['center_y'])
@@ -40,15 +41,23 @@ class TeeVee:
         SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(6,22),size=(3,5))
         SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(13,22),size=(3,5))
         #mouth
-        lines=0
-        if self.emote=="happy":
-            lines=3
-        elif self.emote=="sad":
-            lines=1
-        for (i) in range(lines):
-            SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(6+i,29+i),size=(10-i*2,1))
-        
-
+        pos1=(6,28)
+        self.mouth="happy"
+        if self.mouth=="smile":
+            for (i) in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+i),size=(10-i*2,2))
+        elif self.mouth=="happy":
+            for (i) in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+i),size=(10-i*2,2),outlines=i)
+        elif self.mouth=="sad":
+            for (i) in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+2-i),size=(10-i*2,2),outlines=i)
+        elif self.mouth=="openmouth":
+            for (i) in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i-1, pos1[1]+i-1),size=(12-i*2,1),color=(0,0,0))
+                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+i),size=(10-i*2,1),color=(0,0,0))
+        elif self.mouth=="neutral":
+            SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0], pos1[1]+1),size=(10,1))
         return True
     
 #sound player
@@ -232,9 +241,9 @@ class spriteLoader:
             SCREEN.blit(sprite, (x, y))
             return True
         return False
-    def draw_relative_to_sprite(self, sprite,startpos,size):
+    def draw_relative_to_sprite(self, key,startpos,size,color=(255,255,255),outlines=0):
         # Calcula a posição do frame na tela (centralizado)
-        dic=self.sprites.get(sprite)
+        dic=self.sprites.get(key)
         sprite = dic["sprite"]
         frame_width = sprite.get_width()
         frame_height = sprite.get_height()
@@ -247,9 +256,13 @@ class spriteLoader:
         rect_y = frame_y + (startpos[1]/sprite_height * frame_height)
         rect_width = size[0]/sprite_width * frame_width
         rect_height = size[1]/sprite_height * frame_height
-        
         rect = pygame.Rect(rect_x, rect_y, rect_width, rect_height)
-        pygame.draw.rect(SCREEN, (255, 255, 255), rect)
+        pygame.draw.rect(SCREEN, color, rect)       
+        
+        if outlines:
+            startpos=(startpos[0],startpos[1]-1)
+            size=(size[0],size[1])
+            self.draw_relative_to_sprite(key,startpos,size,color=(0,0,0))  
         return True
         
     def get_sprite(self, key):
