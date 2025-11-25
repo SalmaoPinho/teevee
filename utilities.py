@@ -8,6 +8,9 @@ def initialize():
     DEFS = {
         key: float(value) for key, value in definitions.items('SCREEN')
     }
+    DEFS.update({
+        key: bool(value) for key, value in definitions.items('TOGGLE')
+    })
     SCREEN = pygame.display.set_mode((int(DEFS['width']), int(DEFS['height'])))
     SHEET= pygame.image.load("assets/spritesheet.png").convert_alpha()
     PROPSYS=ProportionalSystem(DEFS['width'], DEFS['height'])

@@ -10,6 +10,8 @@ OVERLAY_IMAGE = pygame.image.load("assets/overlay.png").convert_alpha()
 pygame.display.set_caption("Euphemerais")
 clock = pygame.time.Clock()
 tv = utilities.TeeVee()
+if DEFS['fullscreen']:
+    pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 # Loop principal
 UElement= utilities.UElement
 ui = [
@@ -96,6 +98,9 @@ while running:
             for button in buttons:
                 if button.is_clicked(event.pos, event):
                     print(f"{button.text} clicado!")
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
     # Limpa a tela
     screen.fill((50, 50, 50))
     # Desenha a TV
