@@ -1,15 +1,16 @@
 import pygame
 import os
 import configparser
+import datetime
 def initialize():
-    global SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER
+    global SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER, GAMECLOCK
     definitions = configparser.ConfigParser()
     definitions.read('defs.ini')
     DEFS = {
         key: float(value) for key, value in definitions.items('SCREEN')
     }
     DEFS.update({
-        key: bool(value) for key, value in definitions.items('TOGGLE')
+    key: definitions.getboolean('TOGGLE', key) for key in definitions['TOGGLE']
     })
     SCREEN = pygame.display.set_mode((int(DEFS['width']), int(DEFS['height'])))
     SHEET= pygame.image.load("assets/spritesheet.png").convert_alpha()
@@ -20,7 +21,21 @@ def initialize():
     crt_texture.set_alpha(50)
     crt_overlay = pygame.Surface((DEFS['width'], DEFS['height']), pygame.SRCALPHA)
     crt_texture = pygame.transform.scale(crt_texture, (DEFS['crtsize'], DEFS['crtsize']))
-    return SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER
+    GAMECLOCK = Glock()
+    return SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER, GAMECLOCK
+class Glock:
+    def __init__(self):
+        self.update()
+    def update(self):
+        now = datetime.datetime.now()
+        self.vals={
+            'time_12hr': now.strftime("%I:%M:%S %p"),  # 02:30:45 PM
+            'time_24hr': now.strftime("%H:%M:%S"),     # 14:30:45
+            'time_short': now.strftime("%H:%M"),       # 14:30
+            'week_day': now.strftime("%A"),  # Monday
+            'short_date': now.strftime("%m/%d/%Y"),      # 01/15/2024
+        }
+    
 class TeeVee:
     def __init__(self):
         SPRITE_LOADER.create_sprite(
@@ -120,8 +135,8 @@ class ProportionalSystem:
             self.percent_to_px_y(height_percent)
         )
 class UElement:
-    def __init__(self, x_percent, y_percent, width_percent, height_percent, 
-                 text='', color=None,clickable=False, font_size_percent=0.1,outline_size=5):
+    def __init__(self, x_percent=0, y_percent=0, width_percent=1, height_percent=1, 
+                 text='', color=None,clickable=False, font_size_percent=0.1,outline_size=5,subelements=None):
         """
         Botão com coordenadas proporcionais
         
@@ -157,18 +172,42 @@ class UElement:
         self.width_percent = width_percent
         self.height_percent = height_percent
         self.font_size_percent = font_size_percent
-    
+        self.subelements = {}
+        if subelements is not None:
+            for subelement_key, subelement_dict in subelements.items():
+                # Cria o UElement a partir do dicionário
+                self.subelements[subelement_key] = UElement(
+                    x_percent=self.x_percent + subelement_dict.get('x_percent', 0) * self.width_percent,
+                    y_percent=self.y_percent + subelement_dict.get('y_percent', 0) * self.height_percent,
+                    width_percent=self.width_percent * subelement_dict.get('width_percent', 1),
+                    height_percent=self.height_percent * subelement_dict.get('height_percent', 1),
+                    font_size_percent=subelement_dict.get('font_size_percent', 0.1),
+                    text=subelement_dict.get('text', ''),
+                    color=subelement_dict.get('color', None),
+                    clickable=subelement_dict.get('clickable', False),
+                    outline_size=subelement_dict.get('outline_size', 5),
+                    subelements=subelement_dict.get('subelements', None) 
+                )
+                
     def draw(self,screen):
         """Desenha o botão na superfície"""
+        text_surface=self.text_surface
         if self.color:
             pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
-        screen.blit(self.text_surface, self.text_rect)
+        #get first character
+        if self.text!='' and self.text[0]=='!':
+            self.update_font(newtext=GAMECLOCK.vals.get(self.text[1:], ''))
+        screen.blit(text_surface, self.text_rect)
+        for subelement_key in self.subelements:
+            subelement = self.subelements[subelement_key]
+            subelement.draw(screen)
     
-    def update_font(self, scale=1):
+    def update_font(self, scale=1,newtext=None):
         # Atualiza fonte
         font_size = int(PROPSYS.percent_to_px_y(self.font_size_percent*scale))
         self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
-        self.text_surface = self.font.render(self.text, True, (255, 255, 255))
+        text=self.text if newtext is None else newtext
+        self.text_surface = self.font.render(text, True, (255, 255, 255))
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
     
     def check_hover(self, pos):
