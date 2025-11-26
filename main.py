@@ -32,7 +32,7 @@ while running:
     # Limpa a tela
     screen.fill((50, 50, 50))
     # Desenha a TV
-    tv.draw()
+    #tv.draw_tv(screen)
     ui.render_ui(screen)    
     screen.blit(crt, (0, 0))
     OVERLAY_IMAGE = pygame.transform.scale(OVERLAY_IMAGE, (DEFS['width'], DEFS['height']))

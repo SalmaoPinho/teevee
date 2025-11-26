@@ -2,6 +2,7 @@ import pygame
 import os
 import configparser
 import datetime
+import psutil
 def initialize():
     global SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER, GAMECLOCK
     definitions = configparser.ConfigParser()
@@ -23,9 +24,60 @@ def initialize():
     crt_texture = pygame.transform.scale(crt_texture, (DEFS['crtsize'], DEFS['crtsize']))
     GAMECLOCK = Glock()
     return SCREEN,DEFS, SHEET, PROPSYS,SPRITE_LOADER, GAMECLOCK
+def get_cpu_temperature():
+    """Get CPU temperature in Celsius"""
+    try:
+        with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
+            temp = float(f.read().strip()) / 1000.0
+        return temp
+    except:
+        return "N/A"
+
+def get_system_info():
+    """Get various system information"""
+    info = {}
+    
+    # CPU information
+    info['cpu_temp'] = get_cpu_temperature()
+    info['cpu_usage'] = psutil.cpu_percent(interval=1)
+    info['cpu_freq'] = psutil.cpu_freq().current if psutil.cpu_freq() else "N/A"
+    
+    # Memory information
+    memory = psutil.virtual_memory()
+    info['memory_total'] = round(memory.total / (1024**3), 2)  # GB
+    info['memory_used'] = round(memory.used / (1024**3), 2)    # GB
+    info['memory_percent'] = memory.percent
+    
+    # Disk information
+    disk = psutil.disk_usage('/')
+    info['disk_total'] = round(disk.total / (1024**3), 2)      # GB
+    info['disk_used'] = round(disk.used / (1024**3), 2)        # GB
+    info['disk_percent'] = disk.percent
+    
+    # Network information (since boot)
+    net = psutil.net_io_counters()
+    info['net_sent'] = round(net.bytes_sent / (1024**2), 2)    # MB
+    info['net_recv'] = round(net.bytes_recv / (1024**2), 2)    # MB
+    return info
 class Glock:
     def __init__(self):
         self.update()
+        net = psutil.net_io_counters()
+        disk= psutil.disk_usage('/')
+        memory= psutil.virtual_memory()
+        self.info = {
+            'cpu_temp': get_cpu_temperature(),
+            'cpu_usage': psutil.cpu_percent(interval=0.1),
+            'cpu_freq': psutil.cpu_freq().current if psutil.cpu_freq() else "N/A",
+            'disk_total': round(disk.total / (1024**3), 2),      # GB
+            'disk_used': round(disk.used / (1024**3), 2),        # GB
+            'disk_percent': disk.percent,
+            'memory_total': round(memory.total / (1024**3), 2),  # GB
+            'memory_used': round(memory.used / (1024**3), 2),    # GB
+            'memory_percent': memory.percent,
+            'net_sent': round(net.bytes_sent / (1024**2), 2),    # MB
+            'net_recv': round(net.bytes_recv / (1024**2), 2),    # MB
+        }
     def update(self):
         now = datetime.datetime.now()
         self.vals={
@@ -35,7 +87,7 @@ class Glock:
             'week_day': now.strftime("%A"),  # Monday
             'short_date': now.strftime("%m/%d/%Y"),      # 01/15/2024
         }
-    
+
 class TeeVee:
     def __init__(self):
         SPRITE_LOADER.create_sprite(
@@ -196,7 +248,14 @@ class UElement:
             pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
         #get first character
         if self.text!='' and self.text[0]=='!':
-            self.update_font(newtext=GAMECLOCK.vals.get(self.text[1:], ''))
+            if (self.text[1:] in GAMECLOCK.vals):
+                self.update_font(newtext=GAMECLOCK.vals[self.text[1:]])
+            elif (self.text[1:] in GAMECLOCK.info):
+                self.update_font(newtext=GAMECLOCK.info[self.text[1:]])
+                print(GAMECLOCK.info[self.text[1:]])
+            else:
+                self.update_font(newtext="N/A")
+                print(f"Chave não encontrada: {self.text[1:]}")
         screen.blit(text_surface, self.text_rect)
         for subelement_key in self.subelements:
             subelement = self.subelements[subelement_key]
@@ -207,7 +266,7 @@ class UElement:
         font_size = int(PROPSYS.percent_to_px_y(self.font_size_percent*scale))
         self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
         text=self.text if newtext is None else newtext
-        self.text_surface = self.font.render(text, True, (255, 255, 255))
+        self.text_surface = self.font.render(str(text), True, (255, 255, 255))
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
     
     def check_hover(self, pos):

@@ -1,6 +1,6 @@
-from utilities import UElement, Glock
+from utilities import UElement, Glock,TeeVee
 glock=Glock()
-
+tv=TeeVee()
 user_interface = {
     "top_bar": UElement(
         x_percent=0.125,
@@ -39,12 +39,27 @@ user_interface = {
         height_percent=0.675,
         color=(255, 255, 255),
         subelements={
-            "dialog_text": {
-                'y_percent':0.8,
-                'width_percent':1,
+            "cpu-info": {
+                'y_percent':0.0,
                 'height_percent':0.2,
                 'font_size_percent':0.05,
-                'text':"Testing this is a dialog hello",
+                'subelements':{
+                    "cpu-temp": {
+                        'y_percent':0.0,
+                        'text':"!cpu_temp",
+                        'font_size_percent':0.05,
+                    },
+                    "cpu-usage": {
+                        'y_percent':0.33,
+                        'text':"!cpu_usage",
+                        'font_size_percent':0.05,
+                    },
+                    "cpu-freq": {
+                        'y_percent':0.66,
+                        'text':"!cpu_freq",
+                        'font_size_percent':0.05
+                    },
+                }
             },
         }
     ),
