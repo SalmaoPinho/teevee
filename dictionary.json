@@ -1,0 +1,194 @@
+{
+    "format" :{
+        "subtitle": {
+            "text": "Example Subtitle",
+            "y_percent": 0.8,
+            "height_percent": 0.2,
+            "background":false,
+            "font_size_percent": 0.05
+        },
+        "fullstats": {
+            "subelements": {
+                "CPUBox": {
+                    "width_percent": 0.5,
+                    "height_percent": 0.5,
+                    "subelements": {
+                        "CPU_HEADER": {
+                            "text": "CPU",
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04
+                        },
+                        "CPU TEMP": {
+                            "text": "!cpu_temp_bar C",
+                            "y_percent": 0.25,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "CPU Usage": {
+                            "text": "!cpu_usage %",
+                             "y_percent": 0.50,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "CPU FREQ": {
+                            "text": "!cpu_freq MHz",
+                            "y_percent": 0.75,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        }
+                    }
+                },
+                "RAMBox": {
+                    "x_percent": 0.5,
+                    "width_percent": 0.5,
+                    "height_percent": 0.5,
+                    "subelements": {
+                        "RAM_HEADER": {
+                            "text": "RAM",
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04
+                        },
+                        "RAMUSED": {
+                            "text": "!memory_used GB",
+                            "y_percent": 0.25,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "RAMTOTAL": {
+                            "text": "!memory_total GB",
+                             "y_percent": 0.50,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "RAMPERCENT": {
+                            "text": "!memory_percent %",
+                            "y_percent": 0.75,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        }
+                    }
+                },
+                "MEMORYBox": {
+                    "y_percent": 0.5,
+                    "width_percent": 0.5,
+                    "height_percent": 0.5,
+                    "subelements": {
+                        "MEM_HEADER": {
+                            "text": "DISK",
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04
+                        },
+                        "MEMUSED": {
+                            "text": "!disk_used GB",
+                            "y_percent": 0.25,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "MEMTOTAL": {
+                            "text": "!disk_total GB",
+                             "y_percent": 0.50,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "MEMPERCENT": {
+                            "text": "!disk_percent %",
+                            "y_percent": 0.75,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        }
+                    }
+                },
+                "NETBox": {
+                    "x_percent": 0.5,
+                    "y_percent": 0.5,
+                    "width_percent": 0.5,
+                    "height_percent": 0.5,
+                    "subelements": {
+                        "NET_HEADER": {
+                            "text": "NET",
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04
+                        },
+                        "NETUSED": {
+                            "text": "!net_sent MB",
+                            "y_percent": 0.25,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "NETTOTAL": {
+                            "text": "!net_recv MB",
+                             "y_percent": 0.50,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        }
+                    }
+                }
+            }
+        },
+        "tvstage": {
+            "text": "!tv",
+            "background":false,
+            "y_percent": 0,
+            "height_percent": 0.8,
+            "font_size_percent": 0.05
+        },
+        "map": {
+            "background":false,
+            "subelements": {
+                "MAP_VIEW": {
+                    "width_percent": 0.25,
+                    "subelements": {
+                        "MAP_ZOOM": {
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04
+                        },
+                        "MAP_COORDS": {
+                             "y_percent": 0.25,
+                            "height_percent": 0.75,
+                            "subelements":{
+                                "MAP_LAT": {
+                                    "height_percent": 0.5,
+                                    "font_size_percent": 0.04,
+                                    "text": "!map_lat"
+                                },
+                                "MAP_LON": {
+                                    "y_percent": 0.5,
+                                    "height_percent": 0.5,
+                                    "font_size_percent": 0.04,
+                                    "text": "!map_lon"
+                                }
+                            }
+                        }
+                    }
+                },
+                "MAP_INFO": {
+                    "x_percent": 0.25,
+                    "width_percent": 0.75
+                }
+        }
+    }
+    },
+    "contentvals": {
+        "MENU": {
+            "format":"subtitle",
+            "format2":"tvstage"
+        },
+        "GPS": {
+            "format":"map"
+        },
+        "INFO": {
+            "format":"fullstats"
+        }
+    }
+}
