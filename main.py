@@ -4,6 +4,7 @@ import config
 import graphics
 import ui
 import game_clock
+import map_system
 
 # Inicialização
 pygame.init()
@@ -25,6 +26,8 @@ OVERLAY_IMAGE = pygame.image.load("assets/overlay.png").convert_alpha()
 # Init Systems
 GAME_CLOCK = game_clock.Glock()
 ui.init_ui_system(DEFS['width'], DEFS['height'], GAME_CLOCK)
+MAP_SYSTEM = map_system.RealMap(GAME_CLOCK)
+ui.set_map_system(MAP_SYSTEM)
 SPRITE_LOADER = graphics.init_graphics(SCREEN, SHEET, ui.PROPSYS)
 
 clock = pygame.time.Clock()
@@ -36,7 +39,7 @@ crt = graphics.apply_crt_effect()
 buttons = ui.clickable_elements()
 
 running = True
-content_index = 0
+content_index = config.getVars('content_index')
 categories = list(DICT['contentvals'].keys())
 
 while running:
@@ -49,12 +52,25 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             for button in buttons:
                 if button.is_clicked(event.pos, event):
-                    content_index = (content_index + 1) % len(categories)
-                    config.setVars('content_index', content_index)
-                    element = ui.searchElement(ui.user_interface['content_panel'], categories[content_index])
-                    for name, sibling in element.parent.subelements.items():
-                        sibling.visible = False
-                    element.visible = True
+                    if button.text == ">>":
+                        content_index = (content_index + 1) % len(categories)
+                        config.setVars('content_index', content_index)
+                        element = ui.searchElement(ui.user_interface['content_panel'], categories[content_index])
+                        for name, sibling in element.parent.subelements.items():
+                            sibling.visible = False
+                        element.visible = True
+                    elif button.text == "<<":
+                        content_index = (content_index - 1) % len(categories)
+                        config.setVars('content_index', content_index)
+                        element = ui.searchElement(ui.user_interface['content_panel'], categories[content_index])
+                        for name, sibling in element.parent.subelements.items():
+                            sibling.visible = False
+                        element.visible = True
+                    elif button.text == "+":
+                        print("zoom")
+                        MAP_SYSTEM.map_manager.zoom_in()
+                    elif button.text == "-":
+                        MAP_SYSTEM.map_manager.zoom_out()
                     
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:

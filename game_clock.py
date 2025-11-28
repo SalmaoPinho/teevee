@@ -36,7 +36,30 @@ class Glock:
             'net_recv': round(net.bytes_recv / (1024**2), 2),    # MB
             'map_lat': loc['lat'],
             'map_lon': loc['lon'],
+            'weather_temp': self.get_weather_temp(),
+            'weather_rain': self.get_weather_rain(),
+            'weather_cond': self.get_weather_condition(),
         })
+
+    def get_weather_temp(self):
+        """Simula temperatura baseada na hora"""
+        import random
+        base_temp = 20
+        hour = datetime.datetime.now().hour
+        # Mais quente ao meio dia (12-14), mais frio a noite
+        variation = -abs(hour - 14) + 5 
+        return base_temp + variation + random.randint(-2, 2)
+
+    def get_weather_rain(self):
+        """Simula chance de chuva"""
+        import random
+        return random.randint(0, 100)
+
+    def get_weather_condition(self):
+        """Simula condição do tempo"""
+        import random
+        conditions = ["Sunny", "Cloudy", "Rainy", "Stormy", "Foggy"]
+        return random.choice(conditions)
     def update(self):
         now = datetime.datetime.now()
         self.vals={
@@ -46,6 +69,8 @@ class Glock:
             'time_short': now.strftime("%H:%M"),       # 14:30
             'week_day': now.strftime("%A"),  # Monday
             'short_date': now.strftime("%m/%d/%Y"),      # 01/15/2024
+            'month_name': now.strftime("%B"),            # January
+            'days_left': (datetime.date(now.year, 12, 31) - now.date()).days, # 365
         }
         #refresh info every minute
         if self.last_minute != now.minute:

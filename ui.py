@@ -3,6 +3,9 @@ import os
 from config import DICT, DEFS, getVars
 from game_clock import Glock
 from graphics import TeeVee
+import datetime
+import calendar
+import copy
 
 # --- Audio System ---
 sounds = {
@@ -29,10 +32,15 @@ background_color = None
 secondary_color = None
 user_interface = {}
 categories = []
+MAP_SYSTEM = None
 
 def set_tv(tv_instance):
     global TV
     TV = tv_instance
+
+def set_map_system(map_sys):
+    global MAP_SYSTEM
+    MAP_SYSTEM = map_sys
 
 def init_ui_system(width, height, game_clock):
     global PROPSYS, GAME_CLOCK, categories, glock, primary_color, background_color, secondary_color, user_interface
@@ -221,6 +229,7 @@ class UElement:
         if subelements is not None:
             for subelement_key, subelement_dict in subelements.items():
                 self.add_subelement(subelement_key, subelement_dict)
+
     def add_subelement(self, subelement_key, subelement_dict):
         self.subelements[subelement_key] = UElement(
             x_percent=subelement_dict.get('x_percent', 0),
@@ -239,6 +248,7 @@ class UElement:
             background=subelement_dict.get('background', True),
             visible=subelement_dict.get('visible', True)
         )
+
     def draw(self,screen):
         if not self.visible:
             return
@@ -249,28 +259,72 @@ class UElement:
                 pygame.draw.rect(screen, self.color, self.rect, border_radius=30)
             else:
                 pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
-        #get first character
-        if self.text!='' and self.text[0]=='!':
-            command=self.text[1:]
-            args=''
-            txt="N/A"
-            if ' ' in command:
-                command=command.split(' ')[0]
-                #salva o resto como args
-                args=' '.join(self.text.split(' ')[1:])
-            if command=='header':
-                vars=getVars('content_index')
-                if vars < len(categories):
-                    txt=categories[vars]
+        
+        # Parse text for variables
+        txt = self.text
+        if '!' in self.text:
+            words = self.text.split(' ')
+            new_words = []
+            for word in words:
+                if '!' in word:
+                    # Handle cases like "Rain: !weather_rain %" where ! is inside
+                    # We need to extract the variable name. Assuming simple !var format
+                    # or !var_name
+                    
+                    # Simple approach: if word starts with !, try to replace it
+                    # If it contains !, split by ! and replace the part after
+                    
+                    prefix = ""
+                    suffix = ""
+                    command = word
+                    
+                    if '!' in word:
+                        parts = word.split('!')
+                        prefix = parts[0]
+                        command = parts[1]
+                        # Handle potential punctuation after command?
+                        # For now assume clean separation or simple suffix
+                    
+                    val = "N/A"
+                    if command == 'header':
+                        vars=getVars('content_index')
+                        if vars < len(categories):
+                            val=categories[vars]
+                        else:
+                            val="Error"
+                    elif command=="tv":
+                        if TV:
+                            TV.draw()
+                        val = "" # Don't print anything for tv command
+                    elif command=="map_render":
+                        if MAP_SYSTEM:
+                            MAP_SYSTEM.set_content_area(self.rect)
+                            # Get location from game clock if available, otherwise default
+                            lat = 42.355
+                            lon = -71.065
+                            if GAME_CLOCK and 'map_lat' in GAME_CLOCK.info:
+                                 lat = GAME_CLOCK.info['map_lat']
+                                 lon = GAME_CLOCK.info['map_lon']
+                            
+                            map_surf, source = MAP_SYSTEM.get_static_map(lat, lon)
+                            if map_surf:
+                                screen.blit(map_surf, self.rect)
+                        val = "" # Don't print anything for map command
+                    elif GAME_CLOCK and (command in GAME_CLOCK.vals):
+                        val=GAME_CLOCK.vals[command]
+                    elif GAME_CLOCK and (command in GAME_CLOCK.info):
+                        val=str(GAME_CLOCK.info[command])
+                    
+                    if val != "":
+                         new_words.append(prefix + str(val) + suffix)
                 else:
-                    txt="Error"
-            elif command=="tv":
-                if TV:
-                    TV.draw()
-            elif GAME_CLOCK and (command in GAME_CLOCK.vals):
-                txt=GAME_CLOCK.vals[command]
-            elif GAME_CLOCK and (command in GAME_CLOCK.info):
-                txt=str(GAME_CLOCK.info[command]) + " " + args
+                    new_words.append(word)
+            
+            if any(w != "" for w in new_words):
+                txt = " ".join(new_words)
+            else:
+                txt = "" # If all replacements resulted in empty strings (like map_render), keep it empty
+                
             self.update_font(newtext=txt)
         screen.blit(text_surface, self.text_rect)
         for subelement_key in self.subelements:
@@ -329,6 +383,53 @@ def searchElement(element,key):
                 return result
     return None
 
+def generate_calendar_subelements():
+    now = datetime.datetime.now()
+    year = now.year
+    month = now.month
+    
+    # Get number of days in month and start day
+    num_days = calendar.monthrange(year, month)[1]
+    
+    calendar_subs = {}
+    
+    # Grid layout: 7 columns (Mon-Sun), 5-6 rows
+    cols = 7
+    rows = 6
+    
+    cell_width = 1.0 / cols
+    cell_height = 1.0 / rows
+    
+    # Start position (offset for first day of month)
+    # monthrange returns (weekday, days). weekday is 0-6 (Mon-Sun)
+    # We want Sunday to be 0, so we shift by +1 and mod 7
+    # Mon(0)->1, Tue(1)->2, ..., Sat(5)->6, Sun(6)->0
+    start_day = (calendar.monthrange(year, month)[0] + 1) % 7
+    
+    current_row = 0
+    current_col = start_day
+    
+    for day in range(1, num_days + 1):
+        key = f"CALENDAR_DAY{day}"
+        
+        calendar_subs[key] = {
+            "text": str(day),
+            "x_percent": current_col * cell_width,
+            "y_percent": current_row * cell_height,
+            "width_percent": cell_width,
+            "height_percent": cell_height,
+            "font_size_percent": 0.03,
+            "background": True if day == now.day else False,
+            "color": primary_color
+        }
+        
+        current_col += 1
+        if current_col >= cols:
+            current_col = 0
+            current_row += 1
+            
+    return calendar_subs
+
 def build_ui():
     vars = getVars('content_index')
     for i, (menu, vals) in enumerate(DICT['contentvals'].items()): 
@@ -336,12 +437,60 @@ def build_ui():
             'visible': i==vars,
             'subelements':{},
         }
+        
+        # Deep copy vals to avoid modifying the original DICT
+        vals_copy = copy.deepcopy(vals)
+        
+        # Inject calendar days if this is the weather panel
+        if 'format' in vals_copy and vals_copy['format'] == 'weather':
+            # We need to find the CALENDAR_FRAME in the structure and populate it
+            # The structure is in DICT['format']['weather']
+            # But here we are iterating over contentvals.
+            # The 'vals' here is just {'format': 'weather'}
+            
+            # We need to modify the loaded format from DICT['format']['weather']
+            # But we can't modify DICT directly or it will persist/duplicate on re-renders if we were to re-render
+            # However, build_ui is called once.
+            
+            # Let's get the weather format
+            weather_format = copy.deepcopy(DICT['format']['weather'])
+            
+            # Find CALENDAR_FRAME
+            if 'subelements' in weather_format:
+                if 'WEATHER_DISPLAY' in weather_format['subelements']:
+                    if 'subelements' in weather_format['subelements']['WEATHER_DISPLAY']:
+                        if 'CALENDAR_FRAME' in weather_format['subelements']['WEATHER_DISPLAY']['subelements']:
+                            calendar_frame = weather_format['subelements']['WEATHER_DISPLAY']['subelements']['CALENDAR_FRAME']
+                            calendar_frame['subelements'] = generate_calendar_subelements()
+            
+            # Now use this modified format for this menu item
+            # We need to manually construct the frame content because the loop below expects key-value pairs
+            # that map to subelements.
+            
+            # Actually, the loop below iterates over keys in 'vals'.
+            # For WEATHER, vals is {"format": "weather"}
+            # The loop sees key="format", val="weather"
+            # It checks if 'format' in name (yes) and DICT['format'][val] exists (yes)
+            # Then it sets format=DICT['format'][val]
+            
+            # So we need to intercept this specific case in the loop
+            pass
+
         enums=list(enumerate(vals.items()))
         for j, (name, val) in enums:
             format={}
             
             if 'format' in name and DICT['format'][val]:
-                format=DICT['format'][val]
+                if val == 'weather':
+                     # Special handling for weather to inject calendar
+                     format = copy.deepcopy(DICT['format'][val])
+                     # Inject calendar
+                     try:
+                        format['subelements']['WEATHER_DISPLAY']['subelements']['CALENDAR_FRAME']['subelements'] = generate_calendar_subelements()
+                     except KeyError:
+                         print("Could not inject calendar: structure mismatch")
+                else:
+                    format=DICT['format'][val]
             else:
                 format = {
                     'text': name + " : ",
@@ -364,17 +513,21 @@ def build_ui():
             frame['subelements'][name] = format 
         user_interface['content_panel'].add_subelement(menu, frame)
 
+def get_all_clickable(element):
+    buttons = []
+    if element.clickable:
+        buttons.append(element)
+    for subelement_key in element.subelements:
+        subelement = element.subelements[subelement_key]
+        buttons.extend(get_all_clickable(subelement))
+    return buttons
+
 def clickable_elements():
     buttons=[]
     
     for element_key in user_interface:
         element = user_interface[element_key]
-        if element.clickable:
-            buttons.append(element)
-        for subelement_key in element.subelements:
-            subelement = element.subelements[subelement_key]
-            if subelement.clickable:
-                buttons.append(subelement)
+        buttons.extend(get_all_clickable(element))
     return buttons
 
 def render_ui(screen):

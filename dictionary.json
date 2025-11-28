@@ -1,10 +1,10 @@
 {
-    "format" :{
+    "format": {
         "subtitle": {
             "text": "Example Subtitle",
             "y_percent": 0.8,
             "height_percent": 0.2,
-            "background":false,
+            "background": false,
             "font_size_percent": 0.05
         },
         "fullstats": {
@@ -27,7 +27,7 @@
                         },
                         "CPU Usage": {
                             "text": "!cpu_usage %",
-                             "y_percent": 0.50,
+                            "y_percent": 0.50,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04,
                             "background": false
@@ -60,7 +60,7 @@
                         },
                         "RAMTOTAL": {
                             "text": "!memory_total GB",
-                             "y_percent": 0.50,
+                            "y_percent": 0.50,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04,
                             "background": false
@@ -93,7 +93,7 @@
                         },
                         "MEMTOTAL": {
                             "text": "!disk_total GB",
-                             "y_percent": 0.50,
+                            "y_percent": 0.50,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04,
                             "background": false
@@ -127,7 +127,7 @@
                         },
                         "NETTOTAL": {
                             "text": "!net_recv MB",
-                             "y_percent": 0.50,
+                            "y_percent": 0.50,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04,
                             "background": false
@@ -138,25 +138,38 @@
         },
         "tvstage": {
             "text": "!tv",
-            "background":false,
+            "background": false,
             "y_percent": 0,
             "height_percent": 0.8,
             "font_size_percent": 0.05
         },
         "map": {
-            "background":false,
+            "background": false,
             "subelements": {
                 "MAP_VIEW": {
                     "width_percent": 0.25,
                     "subelements": {
                         "MAP_ZOOM": {
                             "height_percent": 0.25,
-                            "font_size_percent": 0.04
+                            "font_size_percent": 0.04,
+                            "subelements": {
+                                "zoomout": {
+                                    "width_percent": 0.5,
+                                    "text": "-",
+                                    "clickable": true
+                                },
+                                "zoomin": {
+                                    "x_percent": 0.5,
+                                    "width_percent": 0.5,
+                                    "text": "+",
+                                    "clickable": true
+                                }
+                            }
                         },
                         "MAP_COORDS": {
-                             "y_percent": 0.25,
+                            "y_percent": 0.25,
                             "height_percent": 0.75,
-                            "subelements":{
+                            "subelements": {
                                 "MAP_LAT": {
                                     "height_percent": 0.5,
                                     "font_size_percent": 0.04,
@@ -172,23 +185,143 @@
                         }
                     }
                 },
-                "MAP_INFO": {
+                "MAP_DISPLAY": {
                     "x_percent": 0.25,
-                    "width_percent": 0.75
+                    "width_percent": 0.75,
+                    "text": "!map_render"
                 }
+            }
+        },
+        "weather": {
+            "subelements": {
+                "WEATHER_DISPLAY": {
+                    "x_percent": 0.25,
+                    "width_percent": 0.75,
+                    "subelements": {
+                        "CALENDAR_HEADER": {
+                            "text": "!month_name",
+                            "height_percent": 0.125,
+                            "font_size_percent": 0.04
+                        },
+                        "CALENDAR_DAY": {
+                            "y_percent": 0.125,
+                            "height_percent": 0.125,
+                            "subelements": {
+                                "sunday": {
+                                    "text": "S",
+                                    "width_percent": 0.14285,
+                                    "background": false,
+                                    "font_size_percent": 0.04
+                                },
+                                "monday": {
+                                    "x_percent": 0.14285,
+                                    "text": "M",
+                                    "background": false,
+                                    "width_percent": 0.14285,
+                                    "font_size_percent": 0.04
+                                },
+                                "tuesday": {
+                                    "x_percent": 0.2857,
+                                    "text": "T",
+                                    "background":false,
+                                    "width_percent": 0.14285,
+                                    "font_size_percent": 0.04
+                                },
+                                "wednesday": {
+                                    "text": "W",
+                                    "background": false,
+                                    "x_percent": 0.42855,
+                                    "width_percent": 0.14285,
+                                    "font_size_percent": 0.04
+                                },
+                                "thursday": {
+                                    "x_percent": 0.5714,
+                                    "text": "Th",
+                                    "background": false,
+                                    "width_percent": 0.14285,
+                                    "font_size_percent": 0.04
+                                },
+                                "friday": {
+                                    "x_percent": 0.71425,
+                                    "text": "F",
+                                    "background": false,
+                                    "width_percent": 0.14285,
+                                    "font_size_percent": 0.04
+                                },
+                                "saturday": {
+                                    "x_percent": 0.8571,
+                                    "text": "Sa",
+                                    "background": false,
+                                    "width_percent": 0.14285,
+                                    "font_size_percent": 0.04
+                                }
+                            }
+                        },
+                        "CALENDAR_FRAME": {
+                            "y_percent": 0.25,
+                            "height_percent": 0.75,
+                            "subelements": {
+                                "CALENDAR_DAY1": {
+                                    "text": "1",
+                                    "height_percent": 0.125,
+                                    "width_percent": 0.125,
+                                    "font_size_percent": 0.04
+                                }
+                            }
+                        }
+
+                    }
+                },
+                "WEATHER_DETAILS": {
+                    "width_percent": 0.25,
+                    "subelements": {
+                        "WEATHER_DETAILS": {
+                            "y_percent": 0.25,
+                            "height_percent": 0.5,
+                            "subelements": {
+                                "TEMP": {
+                                    "text": "!weather_temp C",
+                                    "height_percent": 0.33,
+                                    "font_size_percent": 0.05
+                                },
+                                "RAIN": {
+                                    "text": "Rain: !weather_rain %",
+                                    "y_percent": 0.33,
+                                    "height_percent": 0.33,
+                                    "font_size_percent": 0.03
+                                },
+                                "COND": {
+                                    "text": "!weather_cond",
+                                    "y_percent": 0.66,
+                                    "height_percent": 0.33,
+                                    "font_size_percent": 0.04
+                                }
+                            }
+                        },
+                        "YEAR_PROGRESS": {
+                            "text": "!days_left Days\nLeft",
+                            "y_percent": 0.75,
+                            "height_percent": 0.25,
+                            "font_size_percent": 0.04
+                        }
+                    }
+                }
+            }
         }
-    }
     },
     "contentvals": {
         "MENU": {
-            "format":"subtitle",
-            "format2":"tvstage"
+            "format": "subtitle",
+            "format2": "tvstage"
         },
         "GPS": {
-            "format":"map"
+            "format": "map"
         },
         "INFO": {
-            "format":"fullstats"
+            "format": "fullstats"
+        },
+        "WEATHER": {
+            "format": "weather"
         }
     }
 }
