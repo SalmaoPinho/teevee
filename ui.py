@@ -93,6 +93,7 @@ def init_ui_system(width, height, game_clock):
             y_percent=0.175,
             width_percent=0.75,
             height_percent=0.675,
+            background=False,
             subelements={
             }
         ),
@@ -435,6 +436,7 @@ def build_ui():
     for i, (menu, vals) in enumerate(DICT['contentvals'].items()): 
         frame={
             'visible': i==vars,
+            'background':True,
             'subelements':{},
         }
         

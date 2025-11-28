@@ -8,6 +8,7 @@
             "font_size_percent": 0.05
         },
         "fullstats": {
+            "background": false,
             "subelements": {
                 "CPUBox": {
                     "width_percent": 0.5,
@@ -15,6 +16,8 @@
                     "subelements": {
                         "CPU_HEADER": {
                             "text": "CPU",
+                            "x_percent": 0.1,
+                            "width_percent": 0.8,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04
                         },
@@ -48,6 +51,8 @@
                     "subelements": {
                         "RAM_HEADER": {
                             "text": "RAM",
+                            "x_percent": 0.1,
+                            "width_percent": 0.8,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04
                         },
@@ -81,6 +86,8 @@
                     "subelements": {
                         "MEM_HEADER": {
                             "text": "DISK",
+                            "x_percent": 0.1,
+                            "width_percent": 0.8,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04
                         },
@@ -115,6 +122,8 @@
                     "subelements": {
                         "NET_HEADER": {
                             "text": "NET",
+                            "x_percent": 0.1,
+                            "width_percent": 0.8,
                             "height_percent": 0.25,
                             "font_size_percent": 0.04
                         },
@@ -144,13 +153,14 @@
             "font_size_percent": 0.05
         },
         "map": {
-            "background": false,
             "subelements": {
                 "MAP_VIEW": {
                     "width_percent": 0.25,
                     "subelements": {
                         "MAP_ZOOM": {
-                            "height_percent": 0.25,
+                            "y_percent": 0.025,
+                            "height_percent": 0.2,
+                            "background": false,
                             "font_size_percent": 0.04,
                             "subelements": {
                                 "zoomout": {
@@ -166,29 +176,51 @@
                                 }
                             }
                         },
-                        "MAP_COORDS": {
-                            "y_percent": 0.25,
-                            "height_percent": 0.75,
-                            "subelements": {
-                                "MAP_LAT": {
-                                    "height_percent": 0.5,
-                                    "font_size_percent": 0.04,
-                                    "text": "!map_lat"
-                                },
-                                "MAP_LON": {
-                                    "y_percent": 0.5,
-                                    "height_percent": 0.5,
-                                    "font_size_percent": 0.04,
-                                    "text": "!map_lon"
-                                }
-                            }
+                        "ZOOM": {
+                            "y_percent": 0.275,
+                            "height_percent": 0.2,
+                            "text": "!map_zoom",
+                            "font_size_percent": 0.04
+                        },
+                        "MAP_LAT": {
+                            "y_percent": 0.475,
+                            "height_percent": 0.2,
+                            "text": "!map_lat",
+                            "font_size_percent": 0.04
+                        },
+                        "MAP_LON": {
+                            "y_percent": 0.675,
+                            "height_percent": 0.2,
+                            "text": "!map_lon",
+                            "font_size_percent": 0.04
+                        },
+                        "MAP_STATUS": {
+                            "y_percent": 0.875,
+                            "height_percent": 0.1,
+                            "text": "!map_status",
+                            "font_size_percent": 0.03,
+                            "color": [
+                                255,
+                                0,
+                                0
+                            ],
+                            "background": false
                         }
                     }
                 },
                 "MAP_DISPLAY": {
                     "x_percent": 0.25,
                     "width_percent": 0.75,
-                    "text": "!map_render"
+                    "subelements": {
+                        "MAP_RENDER": {
+                            "x_percent": 0.05,
+                            "y_percent": 0.05,
+                            "height_percent": 0.9,
+                            "width_percent": 0.9,
+                            "background": false,
+                            "text": "map_render"
+                        }
+                    }
                 }
             }
         },
@@ -223,7 +255,7 @@
                                 "tuesday": {
                                     "x_percent": 0.2857,
                                     "text": "T",
-                                    "background":false,
+                                    "background": false,
                                     "width_percent": 0.14285,
                                     "font_size_percent": 0.04
                                 },
@@ -269,7 +301,6 @@
                                 }
                             }
                         }
-
                     }
                 },
                 "WEATHER_DETAILS": {
@@ -277,6 +308,7 @@
                     "subelements": {
                         "WEATHER_DETAILS": {
                             "y_percent": 0.25,
+                            "background": false,
                             "height_percent": 0.5,
                             "subelements": {
                                 "TEMP": {

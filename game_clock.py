@@ -2,6 +2,7 @@ import datetime
 from flask import json
 import psutil
 import urllib
+from config import getVars
 
 def get_cpu_temperature():
     """Get CPU temperature in Celsius"""
@@ -36,6 +37,7 @@ class Glock:
             'net_recv': round(net.bytes_recv / (1024**2), 2),    # MB
             'map_lat': loc['lat'],
             'map_lon': loc['lon'],
+            'map_zoom': getVars('zoom'),
             'weather_temp': self.get_weather_temp(),
             'weather_rain': self.get_weather_rain(),
             'weather_cond': self.get_weather_condition(),
@@ -71,7 +73,13 @@ class Glock:
             'short_date': now.strftime("%m/%d/%Y"),      # 01/15/2024
             'month_name': now.strftime("%B"),            # January
             'days_left': (datetime.date(now.year, 12, 31) - now.date()).days, # 365
+            'map_zoom': getVars('zoom'),
         }
+        
+        # Ensure map_status exists
+        if 'map_status' not in self.info:
+            self.info['map_status'] = ""
+
         #refresh info every minute
         if self.last_minute != now.minute:
             self.refresh_info()

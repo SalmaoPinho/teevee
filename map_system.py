@@ -3,7 +3,7 @@ import pygame
 import requests
 from io import BytesIO
 import threading
-from config import DEFS
+from config import DEFS, getVars
 
 # Configurações do mapa (Hardcoded defaults since config.ini is missing)
 MAP_CONFIG = {
@@ -25,41 +25,55 @@ class RobustMap:
         ]
         
     def get_tile(self, x, y, zoom):
-        """Obtém um tile individual com cache"""
+        """Obtém um tile individual com cache e retries"""
         cache_key = f"{x}_{y}_{zoom}"
         
         if cache_key in self.cache:
             return self.cache[cache_key]
             
         for server in self.tile_servers:
-            try:
-                url = server.format(z=zoom, x=x, y=y)
-                # print(f"📡 Baixando tile: {url}")  # Debug removed to reduce clutter
-                response = requests.get(url, timeout=3, headers={
-                    'User-Agent': 'PipBoy-3000-MKIV/1.0 (Educational Project)'
-                })
-                
-                if response.status_code == 200:
-                    image_file = BytesIO(response.content)
-                    tile_surface = pygame.image.load(image_file).convert()
+            for attempt in range(3): # 3 attempts per server
+                try:
+                    url = server.format(z=zoom, x=x, y=y)
+                    response = requests.get(url, timeout=2, headers={
+                        'User-Agent': 'PipBoy-3000-MKIV/1.0 (Educational Project)'
+                    })
                     
-                    green_overlay = pygame.Surface(tile_surface.get_size(), pygame.SRCALPHA)
-                    green_overlay.fill((255, 255, 255, 80))
-                    tile_surface.blit(green_overlay, (0, 0))
-                    self.cache[cache_key] = tile_surface
-                    return tile_surface
-                    
-            except Exception as e:
-                print(f"❌ Erro no tile {x},{y}: {e}")
-                continue
-        return None
+                    if response.status_code == 200:
+                        try:
+                            image_file = BytesIO(response.content)
+                            tile_surface = pygame.image.load(image_file).convert()
+                            self.cache[cache_key] = tile_surface
+                            return tile_surface
+                        except pygame.error:
+                            print(f"[ERROR] Invalid image data for tile {x},{y}")
+                            continue
+                            
+                except Exception as e:
+                    # print(f"[ERROR] Erro no tile {x},{y} (attempt {attempt+1}): {e}")
+                    continue
+        
+        # Return placeholder if all fails
+        return self._create_placeholder_tile()
+
+    def _create_placeholder_tile(self):
+        surf = pygame.Surface((256, 256))
+        surf.fill((20, 20, 20)) # Dark gray
+        pygame.draw.rect(surf, (50, 50, 50), (0, 0, 256, 256), 1) # Border
+        pygame.draw.line(surf, (50, 50, 50), (0, 0), (256, 256), 1) # X
+        pygame.draw.line(surf, (50, 50, 50), (256, 0), (0, 256), 1)
+        return surf
 
 class MapManager:
     def __init__(self, game_clock, content_area_rect=None):
         self.robust_map = RobustMap()
         self.game_clock = game_clock
         
-        self.current_zoom = MAP_CONFIG['initial_zoom']
+        try:
+            self.current_zoom = getVars('zoom')
+        except:
+            self.current_zoom = MAP_CONFIG['initial_zoom']
+            
         self.tiles_wide = MAP_CONFIG['tiles_wide']
         self.tiles_high = MAP_CONFIG['tiles_high']
         
@@ -82,10 +96,14 @@ class MapManager:
     def zoom_in(self):
         if self.current_zoom < MAP_CONFIG['max_zoom']:
             self.current_zoom += 1
+            from config import setVars
+            setVars('zoom', self.current_zoom)
             
     def zoom_out(self):
         if self.current_zoom > MAP_CONFIG['min_zoom']:
             self.current_zoom -= 1
+            from config import setVars
+            setVars('zoom', self.current_zoom)
         
     def lat_lon_to_tile(self, lat, lon, zoom):
         """Converte latitude/longitude para coordenadas de tile"""
@@ -129,7 +147,8 @@ class MapManager:
     def _load_map_async(self, lat, lon):
         """Carrega o mapa em uma thread separada"""
         try:
-            print(f"🔄 Carregando mapa assincronamente (zoom {self.current_zoom})...")
+            self.game_clock.info['map_status'] = "LOADING..."
+            print(f"[LOADING] Carregando mapa assincronamente (zoom {self.current_zoom})...")
             
             center_x, center_y = self.lat_lon_to_tile(lat, lon, self.current_zoom)
             
@@ -170,15 +189,16 @@ class MapManager:
             self.last_rendered_lon = lon
             self.last_rendered_zoom = self.current_zoom
             
-            print(f"✅ Mapa carregado: {tiles_loaded} tiles")
+            print(f"[OK] Mapa carregado: {tiles_loaded} tiles")
             
         except Exception as e:
-            print(f"❌ Erro no carregamento: {e}")
+            print(f"[ERROR] Erro no carregamento: {e}")
             self.current_map_surface = self._create_fallback_map()
             self.current_map_source = "FALLBACK MODE"
         finally:
             self.is_loading = False
             self.loading_thread = None
+            self.game_clock.info['map_status'] = ""
     
     def _create_fallback_map(self):
         """Cria um mapa de fallback rápido"""

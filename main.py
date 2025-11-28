@@ -67,10 +67,11 @@ while running:
                             sibling.visible = False
                         element.visible = True
                     elif button.text == "+":
-                        print("zoom")
                         MAP_SYSTEM.map_manager.zoom_in()
+                        config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
                     elif button.text == "-":
                         MAP_SYSTEM.map_manager.zoom_out()
+                        config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
                     
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
