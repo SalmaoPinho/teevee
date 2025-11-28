@@ -38,9 +38,15 @@ class Glock:
             'map_lat': loc['lat'],
             'map_lon': loc['lon'],
             'map_zoom': getVars('zoom'),
+            
             'weather_temp': self.get_weather_temp(),
             'weather_rain': self.get_weather_rain(),
             'weather_cond': self.get_weather_condition(),
+            'music_queue': "Random",
+            'music_album_name': "Holiday",
+            'music_name': "Tin Man",
+            'music_volume': getVars('zoom'),
+            'music_artist': "America",
         })
 
     def get_weather_temp(self):

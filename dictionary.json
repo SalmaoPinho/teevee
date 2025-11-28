@@ -224,6 +224,128 @@
                 }
             }
         },
+         "music": {
+            "subelements": {
+                "MUSIC_VIEW": {
+                    "width_percent": 0.25,
+                    "subelements": {
+                        "VOLUME_CONTROL": {
+                            "y_percent": 0.025,
+                            "height_percent": 0.2,
+                            "background": false,
+                            "font_size_percent": 0.04,
+                            "subelements": {
+                                "volume_down": {
+                                    "width_percent": 0.5,
+                                    "text": "-",
+                                    "clickable": true
+                                },
+                                "volume_up": {
+                                    "x_percent": 0.5,
+                                    "width_percent": 0.5,
+                                    "text": "+",
+                                    "clickable": true
+                                }
+                            }
+                        },
+                        "MUSIC_VOLUME": {
+                            "y_percent": 0.275,
+                            "height_percent": 0.2,
+                            "text": "!music_volume",
+                            "font_size_percent": 0.04
+                        },
+                        "QUEUE": {
+                            "y_percent": 0.475,
+                            "height_percent": 0.2,
+                            "text": "!music_queue",
+                            "font_size_percent": 0.04
+                        },
+                        "ALBUM_NAME": {
+                            "y_percent": 0.675,
+                            "height_percent": 0.2,
+                            "text": "!music_album_name",
+                            "font_size_percent": 0.04
+                        }
+                    }
+                },
+                "ALBUM_DISPLAY": {
+                    "x_percent": 0.25,
+                    "width_percent": 0.75,
+                    "subelements": {
+                        "MAP_RENDER": {
+                            "x_percent": 0.05,
+                            "y_percent": 0.05,
+                            "height_percent": 0.9,
+                            "width_percent": 0.9,
+                            "background": false,
+                            "text": "!music_display"
+                        },
+                        "MUSIC_INFO": {
+                            "x_percent": 0.05,
+                            "width_percent": 0.9,
+                            "height_percent": 0.2,
+                            "y_percent": 0.5,
+                            "background": false,
+                            "subelements": {
+                                "music_name": {
+                                    "height_percent": 0.5,
+                                    "text": "!music_name",
+                                    "font_size_percent": 0.06,
+                                    "background": false
+                                },
+                                "artist": {
+                                    "y_percent": 0.5,
+                                    "height_percent": 0.5,
+                                    "text": "!music_artist",
+                                    "font_size_percent": 0.05,
+                                    "background": false
+                                }
+                            }
+                        },
+                        "controls": {
+                            "y_percent": 0.8,
+                            "height_percent": 0.2,
+                            "background": false,
+                            "subelements": {
+                                "prev": {
+                                    "width_percent": 0.33,
+                                    "text": "<",
+                                    "background": false,
+                                    "clickable": true
+                                },
+                                "bar": {
+                                    "x_percent": 0.15,
+                                    "width_percent": 0.7,
+                                    "y_percent": -0.5,
+                                    "height_percent": 0.3,
+                                    "clickable": true,
+                                    "subelements": {
+                                        "progress": {
+                                            "width_percent": 0.7,
+                                            "inverted_colors": true
+                                        }
+                                    }
+                                },
+                                "pause": {
+                                    "x_percent": 0.33,
+                                    "width_percent": 0.33,
+                                    "text": "II",
+                                    "background": false,
+                                    "clickable": true
+                                },
+                                "next": {
+                                    "x_percent": 0.66,
+                                    "width_percent": 0.33,
+                                    "text": ">",
+                                    "background": false,
+                                    "clickable": true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "weather": {
             "subelements": {
                 "WEATHER_DISPLAY": {
@@ -351,6 +473,9 @@
         },
         "INFO": {
             "format": "fullstats"
+        },
+        "MUSIC": {
+            "format": "music"
         },
         "WEATHER": {
             "format": "weather"

@@ -221,7 +221,9 @@ class UElement:
         self.text_align = text_align
         
         if text_align == 'left':
-            self.text_rect.left = self.rect.left * 1.1
+            self.text_rect.left = self.rect.left *1.1
+        elif text_align == 'right':
+            self.text_rect.right = self.rect.right * 0.9
             
         self.font_size_percent = font_size_percent
         
@@ -297,6 +299,15 @@ class UElement:
                         if TV:
                             TV.draw()
                         val = "" # Don't print anything for tv command
+                    elif command=="music_display":
+                        img="assets/album_example.jpg"
+                        surf=pygame.image.load(img)
+                        surf=pygame.transform.scale(surf, (self.rect.height, self.rect.height))
+                        rect=surf.get_rect(center=self.rect.center)
+                        #apply transparency
+                        surf.set_alpha(128)
+                        screen.blit(surf, rect)
+                        val = "" 
                     elif command=="map_render":
                         if MAP_SYSTEM:
                             MAP_SYSTEM.set_content_area(self.rect)
@@ -340,7 +351,10 @@ class UElement:
         color=self.color if not self.inverted_colors else DEFS['bg'] 
         self.text_surface = self.font.render(str(text), True,color)
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
-    
+        if self.text_align == 'left':
+            self.text_rect.left = self.rect.left *1.1
+        elif self.text_align == 'right':
+            self.text_rect.right = self.rect.right * 0.9
     def check_hover(self, pos):
         """Verifica se o mouse está sobre o botão"""
         if not self.clickable:
