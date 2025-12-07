@@ -1,8 +1,9 @@
 import datetime
-from flask import json
+import json
 import psutil
 import urllib
-from config import getVars
+import random
+from config import getVars, DICT
 
 def get_cpu_temperature():
     """Get CPU temperature in Celsius"""
@@ -12,6 +13,9 @@ def get_cpu_temperature():
         return temp
     except:
         return "N/A"
+def get_random_line():
+
+    return random.choice(DICT['lines']['eng'])
 class Glock:
     def __init__(self):
         self.vals={}
@@ -24,6 +28,7 @@ class Glock:
         memory= psutil.virtual_memory()
         loc=self.get_real_location()
         self.info.update({
+            'subtitle': get_random_line(),
             'cpu_temp': get_cpu_temperature(),
             'cpu_usage': psutil.cpu_percent(interval=0.1),
             'cpu_freq': int(psutil.cpu_freq().current) if psutil.cpu_freq() else "N/A",
@@ -38,7 +43,6 @@ class Glock:
             'map_lat': loc['lat'],
             'map_lon': loc['lon'],
             'map_zoom': getVars('zoom'),
-            
             'weather_temp': self.get_weather_temp(),
             'weather_rain': self.get_weather_rain(),
             'weather_cond': self.get_weather_condition(),

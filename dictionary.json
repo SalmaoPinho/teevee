@@ -1,7 +1,7 @@
 {
     "format": {
         "subtitle": {
-            "text": "Example Subtitle",
+            "text": "!subtitle",
             "y_percent": 0.8,
             "height_percent": 0.2,
             "background": false,
@@ -264,7 +264,8 @@
                             "y_percent": 0.675,
                             "height_percent": 0.2,
                             "text": "!music_album_name",
-                            "font_size_percent": 0.04
+                            "font_size_percent": 0.04,
+                            "background": false
                         }
                     }
                 },
@@ -480,5 +481,12 @@
         "WEATHER": {
             "format": "weather"
         }
+    },
+    "lines": {
+        "eng": [
+            "Good +time!",
+            "Lovely +time we`re having!",
+            "What a +time we`re having!"
+        ]
     }
 }
