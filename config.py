@@ -12,7 +12,10 @@ def getVars(name):
         key: int(value) for key, value in definitions.items('VARIABLES')
     }
     return vars[name]
-def setVars(name, value):
+def setVars(name, value,operate=False):
+    if operate:
+        current_value = getVars(name)
+        value = current_value + value
     definitions.set('VARIABLES', name, str(value))
     with open('defs.ini', 'w') as configfile:
         definitions.write(configfile)

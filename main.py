@@ -52,27 +52,39 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             for button in buttons:
                 if button.is_clicked(event.pos, event):
-                    if button.text == ">>":
-                        content_index = (content_index + 1) % len(categories)
+                    if button.name == "nav_next" or button.name == "nav_prev":
+                        if button.name == "nav_next":
+                            content_index = (content_index + 1) % len(categories)
+                        else:
+                            content_index = (content_index - 1) % len(categories)
                         config.setVars('content_index', content_index)
                         element = ui.searchElement(ui.user_interface['content_panel'], categories[content_index])
                         for name, sibling in element.parent.subelements.items():
                             sibling.visible = False
                         element.visible = True
-                    elif button.text == "<<":
-                        content_index = (content_index - 1) % len(categories)
-                        config.setVars('content_index', content_index)
-                        element = ui.searchElement(ui.user_interface['content_panel'], categories[content_index])
-                        for name, sibling in element.parent.subelements.items():
-                            sibling.visible = False
-                        element.visible = True
-                    elif button.text == "+":
+                        buttons = ui.clickable_elements()
+                        
+                        
+                    elif button.name == "zoom_out":
                         MAP_SYSTEM.map_manager.zoom_in()
                         config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
-                    elif button.text == "-":
+                    elif button.name == "zoom_in":
                         MAP_SYSTEM.map_manager.zoom_out()
                         config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
-                    
+                    elif button.name == "volume_up":
+                        config.setVars('volume',1,True)
+                        GAME_CLOCK.player.volume_change()
+                    elif button.name == "volume_down":
+                        config.setVars('volume',-1,True)
+                        GAME_CLOCK.player.volume_change()
+                    elif button.name == "pause":
+                        if GAME_CLOCK.player.is_playing:
+                            GAME_CLOCK.player.pause()
+                            button.text = "p"
+                        else:
+                            GAME_CLOCK.player.play()
+                            button.text = "II"
+                    print(f"Clicou no botão: {button.name}")
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False

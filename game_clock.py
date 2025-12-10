@@ -3,6 +3,7 @@ import json
 import psutil
 import urllib
 import random
+import audio
 from config import getVars, DICT
 
 def get_cpu_temperature():
@@ -14,13 +15,13 @@ def get_cpu_temperature():
     except:
         return "N/A"
 def get_random_line():
-
     return random.choice(DICT['lines']['eng'])
 class Glock:
     def __init__(self):
         self.vals={}
         self.info={}
         self.last_minute=None
+        self.player=audio.MusicPlayer()
         self.update()
     def refresh_info(self):
         net = psutil.net_io_counters()
@@ -47,10 +48,6 @@ class Glock:
             'weather_rain': self.get_weather_rain(),
             'weather_cond': self.get_weather_condition(),
             'music_queue': "Random",
-            'music_album_name': "Holiday",
-            'music_name': "Tin Man",
-            'music_volume': getVars('zoom'),
-            'music_artist': "America",
         })
 
     def get_weather_temp(self):
@@ -84,6 +81,8 @@ class Glock:
             'month_name': now.strftime("%B"),            # January
             'days_left': (datetime.date(now.year, 12, 31) - now.date()).days, # 365
             'map_zoom': getVars('zoom'),
+            'music_volume': getVars('volume'),
+
         }
         
         # Ensure map_status exists

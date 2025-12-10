@@ -263,7 +263,7 @@
                         "ALBUM_NAME": {
                             "y_percent": 0.675,
                             "height_percent": 0.2,
-                            "text": "!music_album_name",
+                            "text": "!album",
                             "font_size_percent": 0.04,
                             "background": false
                         }
@@ -290,14 +290,14 @@
                             "subelements": {
                                 "music_name": {
                                     "height_percent": 0.5,
-                                    "text": "!music_name",
+                                    "text": "!title",
                                     "font_size_percent": 0.06,
                                     "background": false
                                 },
                                 "artist": {
                                     "y_percent": 0.5,
                                     "height_percent": 0.5,
-                                    "text": "!music_artist",
+                                    "text": "!artist",
                                     "font_size_percent": 0.05,
                                     "background": false
                                 }
@@ -319,18 +319,19 @@
                                     "width_percent": 0.7,
                                     "y_percent": -0.5,
                                     "height_percent": 0.3,
-                                    "clickable": true,
+
                                     "subelements": {
                                         "progress": {
-                                            "width_percent": 0.7,
-                                            "inverted_colors": true
+                                            "width_percent": 0.5,
+                                            "inverted_colors": true,
+                                            "text": "!music_progress"
                                         }
                                     }
                                 },
                                 "pause": {
                                     "x_percent": 0.33,
                                     "width_percent": 0.33,
-                                    "text": "II",
+                                    "text": "!play",
                                     "background": false,
                                     "clickable": true
                                 },

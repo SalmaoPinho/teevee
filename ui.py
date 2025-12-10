@@ -7,21 +7,6 @@ import datetime
 import calendar
 import copy
 
-# --- Audio System ---
-sounds = {
-    'click': 'assets/sounds/click.mp3',
-    'talk': 'assets/sounds/talk.mp3',
-    'cancel': 'assets/sounds/cancel.mp3',
-}
-
-def play_sound(sound):
-    """Toca um arquivo de som"""
-    if not os.path.isfile(sounds[sound]):
-        print(f"Arquivo de som não encontrado: {sounds[sound]}")
-        return
-    sound = pygame.mixer.Sound(sounds[sound])
-    sound.play()
-
 # --- UI System ---
 PROPSYS = None
 GAME_CLOCK = None
@@ -175,7 +160,7 @@ class ProportionalSystem:
 class UElement:
     def __init__(self, x_percent=0, y_percent=0, width_percent=1, height_percent=1, 
                  text='', color=(255,255,255), clickable=False, font_size_percent=0.1, 
-                 text_align='center', outline_size=5, subelements=None, parent=None,inverted_colors=False,background=True,visible=True):
+                 text_align='center', outline_size=5, subelements=None, parent=None,inverted_colors=False,background=True,visible=True,name=None):
         """
         Botão com coordenadas proporcionais
         
@@ -207,6 +192,7 @@ class UElement:
         self.visible=visible
         self.rect = pygame.Rect(x_px, y_px, width_px, height_px)
         self.text = text
+        self.name = name if name else text
         self.color = color
         self.clickable = clickable
         self.hovering = False
@@ -241,11 +227,12 @@ class UElement:
             height_percent=subelement_dict.get('height_percent', 1),
             font_size_percent=subelement_dict.get('font_size_percent', 0.1),
             text=subelement_dict.get('text', ''),
+            name=subelement_dict.get('name', None) if 'name' in subelement_dict else subelement_key,
             text_align=subelement_dict.get('text_align', 'center'),
             color=subelement_dict.get('color', (255,255,255)),
             clickable=subelement_dict.get('clickable', False),
             outline_size=subelement_dict.get('outline_size', 5),
-            parent=self, 
+            parent=self,
             inverted_colors=subelement_dict.get('inverted_colors', False),
             subelements=subelement_dict.get('subelements', None),
             background=subelement_dict.get('background', True),
@@ -255,14 +242,6 @@ class UElement:
     def draw(self,screen):
         if not self.visible:
             return
-        """Desenha o botão na superfície"""
-        text_surface=self.text_surface
-        if self.background:
-            if self.inverted_colors:
-                pygame.draw.rect(screen, self.color, self.rect, border_radius=30)
-            else:
-                pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
-        
         # Parse text for variables
         txt = self.text
         if '!' in self.text:
@@ -299,15 +278,23 @@ class UElement:
                         if TV:
                             TV.draw()
                         val = "" # Don't print anything for tv command
+                    elif command=="play":
+                        if glock.player.is_playing:
+                            val = "||"
+                        else:
+                            val = "p"
                     elif command=="music_display":
-                        img="assets/album_example.jpg"
-                        surf=pygame.image.load(img)
-                        surf=pygame.transform.scale(surf, (self.rect.height, self.rect.height))
+                        img=glock.player.cover_art
+                        surf=pygame.transform.scale(img, (self.rect.height, self.rect.height))
                         rect=surf.get_rect(center=self.rect.center)
                         #apply transparency
                         surf.set_alpha(128)
                         screen.blit(surf, rect)
                         val = "" 
+                    elif command=="music_progress":
+                        progress = glock.player.get_progress()
+                        self.width_percent=progress
+                        val = ""
                     elif command=="map_render":
                         if MAP_SYSTEM:
                             MAP_SYSTEM.set_content_area(self.rect)
@@ -317,7 +304,6 @@ class UElement:
                             if GAME_CLOCK and 'map_lat' in GAME_CLOCK.info:
                                  lat = GAME_CLOCK.info['map_lat']
                                  lon = GAME_CLOCK.info['map_lon']
-                            
                             map_surf, source = MAP_SYSTEM.get_static_map(lat, lon)
                             if map_surf:
                                 screen.blit(map_surf, self.rect)
@@ -326,7 +312,8 @@ class UElement:
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):
                         val=str(GAME_CLOCK.info[command])
-                    
+                    elif GAME_CLOCK and (command in GAME_CLOCK.player.metadata):
+                        val=str(GAME_CLOCK.player.metadata[command])
                     if val != "":
                          new_words.append(prefix + str(val) + suffix)
                 else:
@@ -336,8 +323,15 @@ class UElement:
                 txt = " ".join(new_words)
             else:
                 txt = "" # If all replacements resulted in empty strings (like map_render), keep it empty
-                
             self.update_font(newtext=txt)
+            
+        """Desenha o botão na superfície"""
+        text_surface= self.text_surface
+        if self.background:
+            if self.inverted_colors:
+                pygame.draw.rect(screen, self.color, self.rect, border_radius=30)
+            else:
+                pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
         screen.blit(text_surface, self.text_rect)
         for subelement_key in self.subelements:
             subelement = self.subelements[subelement_key]
@@ -375,7 +369,7 @@ class UElement:
             return False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(pos):
-                play_sound('click')
+                glock.player.play_sound('click')
                 return True
         return False
     
@@ -535,7 +529,8 @@ def get_all_clickable(element):
         buttons.append(element)
     for subelement_key in element.subelements:
         subelement = element.subelements[subelement_key]
-        buttons.extend(get_all_clickable(subelement))
+        if subelement.visible:
+            buttons.extend(get_all_clickable(subelement))
     return buttons
 
 def clickable_elements():
