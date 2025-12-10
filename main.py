@@ -63,8 +63,12 @@ while running:
                             sibling.visible = False
                         element.visible = True
                         buttons = ui.clickable_elements()
-                        
-                        
+                    
+                    elif button.name == "next":
+                        GAME_CLOCK.player.skip_music(dir=1)
+                    elif button.name == "prev":
+                        GAME_CLOCK.player.skip_music(dir=-1)
+                    
                     elif button.name == "zoom_out":
                         MAP_SYSTEM.map_manager.zoom_in()
                         config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)

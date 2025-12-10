@@ -32,7 +32,16 @@ class MusicPlayer:
         self.title = "Unknown"
         self.cover_art = None
         self.metadata = {}
-        self.load_track("City Lights Serenade.mp3")
+        self.queue = [
+            "City Lights Serenade.mp3",
+            "Digital Horizons.mp3",
+        ]
+        self.load_track(self.queue[1])
+    def skip_music(self,dir=1):
+        current_index = self.queue.index(self.current_track)
+        next_index = (current_index + dir) % len(self.queue)
+        self.load_track(self.queue[next_index])
+        self.play()
     def play(self):
         if self.current_track:
             pygame.mixer.music.set_volume(self.volume)

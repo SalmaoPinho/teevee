@@ -280,7 +280,7 @@ class UElement:
                         val = "" # Don't print anything for tv command
                     elif command=="play":
                         if glock.player.is_playing:
-                            val = "||"
+                            val = "II"
                         else:
                             val = "p"
                     elif command=="music_display":
@@ -293,7 +293,14 @@ class UElement:
                         val = "" 
                     elif command=="music_progress":
                         progress = glock.player.get_progress()
-                        self.width_percent=progress
+                        # Atualiza a largura percentual
+                        self.width_percent = self.parent.width_percent * (progress / 100.0) if self.parent else (progress / 100.0)
+                        # Recalcula o rect com a nova largura
+                        x_px = PROPSYS.percent_to_px_x(self.x_percent)
+                        y_px = PROPSYS.percent_to_px_y(self.y_percent)
+                        width_px = PROPSYS.percent_to_px_x(self.width_percent)
+                        height_px = PROPSYS.percent_to_px_y(self.height_percent)
+                        self.rect = pygame.Rect(x_px, y_px, width_px, height_px)
                         val = ""
                     elif command=="map_render":
                         if MAP_SYSTEM:
