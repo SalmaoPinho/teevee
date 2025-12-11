@@ -52,8 +52,11 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             for button in buttons:
                 if button.is_clicked(event.pos, event):
-                    if button.name == "nav_next" or button.name == "nav_prev":
-                        if button.name == "nav_next":
+                    
+                    #divide button name
+                    parts = button.name.split("_")
+                    if parts[0] == "nav":
+                        if parts[1] == "next":
                             content_index = (content_index + 1) % len(categories)
                         else:
                             content_index = (content_index - 1) % len(categories)
@@ -63,31 +66,34 @@ while running:
                             sibling.visible = False
                         element.visible = True
                         buttons = ui.clickable_elements()
-                    
-                    elif button.name == "next":
-                        GAME_CLOCK.player.skip_music(dir=1)
-                    elif button.name == "prev":
-                        GAME_CLOCK.player.skip_music(dir=-1)
-                    
-                    elif button.name == "zoom_out":
-                        MAP_SYSTEM.map_manager.zoom_in()
-                        config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
-                    elif button.name == "zoom_in":
-                        MAP_SYSTEM.map_manager.zoom_out()
-                        config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
-                    elif button.name == "volume_up":
-                        config.setVars('volume',1,True)
-                        GAME_CLOCK.player.volume_change()
-                    elif button.name == "volume_down":
-                        config.setVars('volume',-1,True)
-                        GAME_CLOCK.player.volume_change()
-                    elif button.name == "pause":
-                        if GAME_CLOCK.player.is_playing:
-                            GAME_CLOCK.player.pause()
-                            button.text = "p"
+                        
+                    elif parts[0] == "music":
+                        if parts[1] == "pause":
+                            if GAME_CLOCK.player.is_playing:
+                                GAME_CLOCK.player.pause()
+                                button.text="!SPRITE_play"
+                            else:
+                                GAME_CLOCK.player.play()
+                                button.text="!SPRITE_pause"
+                        elif parts[1] == "next":
+                            GAME_CLOCK.player.skip_music(dir=1)
+                        elif parts[1] == "prev":
+                            GAME_CLOCK.player.skip_music(dir=-1)
+                        elif parts[1] == "queue":
+                            GAME_CLOCK.player.randomize_queue()
+                            
+                    elif parts[0] == "zoom":
+                        if parts[1] == "in":
+                            MAP_SYSTEM.map_manager.zoom_in()
                         else:
-                            GAME_CLOCK.player.play()
-                            button.text = "II"
+                            MAP_SYSTEM.map_manager.zoom_out()
+                        config.setVars('zoom', MAP_SYSTEM.map_manager.current_zoom)
+                        
+                    elif parts[0] == "volume":
+                        if parts[1] == "up":
+                            GAME_CLOCK.player.volume_change(1)
+                        else:
+                            GAME_CLOCK.player.volume_change(-1)
                     print(f"Clicou no botão: {button.name}")
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:

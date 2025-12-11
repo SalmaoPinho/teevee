@@ -14,12 +14,78 @@ def init_graphics(screen, sheet, propsys):
     SHEET = sheet
     PROPSYS = propsys
     SPRITE_LOADER = spriteLoader()
+    crt_overlay = pygame.Surface((int(DEFS['width']), int(DEFS['height'])), pygame.SRCALPHA)
+    SPRITE_LOADER.create_sprite(
+    key="crt_frame",
+    position=(101, 0),
+    size=(16, 16),
+    scale=DEFS["crtsize"]/16,
+    alpha=50
+    )
+    # Load control sprites
+    SPRITE_LOADER.create_sprite(
+    key="skip",
+    position=(23, 0),
+    size=(19, 17),
+    scale=1,
+    )
+    SPRITE_LOADER.create_sprite(
+    key="back",
+    position=(23, 0),
+    size=(19, 17),
+    scale=1,
+    angle=180
+    )
+    SPRITE_LOADER.create_sprite(
+    key="play",
+    position=(0, 37),
+    size=(13, 13),
+    )
+    SPRITE_LOADER.create_sprite(
+    key="pause",
+    position=(25, 19),
+    size=(13, 15),
+    scale=1,
+    )
     
-    # Init CRT vars
-    crt_texture = pygame.image.load("assets/rgb.png").convert_alpha()
-    crt_texture.set_alpha(50)
-    crt_overlay = pygame.Surface((DEFS['width'], DEFS['height']), pygame.SRCALPHA)
-    crt_texture = pygame.transform.scale(crt_texture, (DEFS['crtsize'], DEFS['crtsize']))
+    #weather sprites
+    SPRITE_LOADER.create_sprite(
+    key="temperature",
+    position=(43, 26),
+    size=(11, 27),
+    )
+    SPRITE_LOADER.create_sprite(
+    key="disk",
+    position=(43, 0),
+    size=(25, 25),
+    )
+    SPRITE_LOADER.create_sprite(
+    key="ram",
+    position=(69, 0),
+    size=(32, 19),
+    angle=90,
+    )
+    SPRITE_LOADER.create_sprite(
+    key="net",
+    position=(14, 36),
+    size=(29, 24),
+    )
+    SPRITE_LOADER.create_sprite(
+    key="sun",
+    position=(55, 25),
+    size=(49, 50),
+    )
+    SPRITE_LOADER.create_sprite(
+    key="water",
+    position=(108, 34),
+    size=(20, 32),
+    )
+    SPRITE_LOADER.create_sprite(
+    key="shuffle",
+    position=(117, 0),
+    size=(46, 34),
+    angle=90,
+    )
     
     return SPRITE_LOADER
 
@@ -28,20 +94,25 @@ class spriteLoader:
         self.sprites = {}
         # self.ps was missing in original code, assuming it should be the global PROPSYS
         
-    def create_sprite(self, key, position, size, scale=1.0):
+    def create_sprite(self, key, position, size, scale=1.0, alpha=255, angle=0):
         x, y = position
         width, height = size
         sprite = pygame.Surface((width, height), pygame.SRCALPHA)
         sprite.blit(SHEET, (0, 0), (x, y, width, height))
+        if angle != 0:
+            sprite = pygame.transform.rotate(sprite, angle)
         if scale != 1.0:
             new_width = int(width * scale)
             new_height = int(height * scale)
             sprite = pygame.transform.scale(sprite, (new_width, new_height))
+        if alpha != 255:
+            sprite.set_alpha(alpha)
         self.sprites[key] = {
             "sprite": sprite,
             "size": (width, height),
             "position": position,
             "scale": scale,
+            "alpha": alpha
             }
         return sprite
     
@@ -90,7 +161,12 @@ class spriteLoader:
             size=(size[0],size[1])
             self.draw_relative_to_sprite(key,startpos,size,color=(0,0,0))  
         return True
-        
+    def draw_overlay(self,key):
+        sprite = self.sprites.get(key)["sprite"]
+        for y in range(0, int(DEFS['height']),int(DEFS['crtsize'])):
+            for x in range(0, int(DEFS['width']),int(DEFS['crtsize'])):
+                SCREEN.blit(sprite, (x, y))
+                        
     def get_sprite(self, key):
         return self.sprites.get(key)
 
@@ -146,11 +222,12 @@ class TeeVee:
         SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(x, y), size=(w, h), color=color)
 def apply_crt_effect():
     # Limpar a overlay
-    crt_overlay.fill((0, 0, 0, 0))
+    crt_overlay.fill((0, 0, 0, 0))  # Clear with transparent
     
-    # Aplicar a textura 16x16 repetidamente em toda a tela
+    # Aplicar a textura CRT repetidamente em toda a tela
+    sprite = SPRITE_LOADER.get_sprite("crt_frame")["sprite"]
+    for y in range(0, int(DEFS['height']), int(DEFS['crtsize'])):
+        for x in range(0, int(DEFS['width']), int(DEFS['crtsize'])):
+            crt_overlay.blit(sprite, (x, y))
     
-    for y in range(0, int(DEFS['height']),int(DEFS['crtsize'])):
-        for x in range(0, int(DEFS['width']),int(DEFS['crtsize'])):
-            crt_overlay.blit(crt_texture, (x, y))
     return crt_overlay

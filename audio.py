@@ -1,9 +1,9 @@
 
 import pygame
-import os
+import os,io
 import struct
-import io
-from config import getVars
+import random
+from config import getVars,setVars
 
 try:
     from mutagen.id3 import ID3
@@ -33,8 +33,7 @@ class MusicPlayer:
         self.cover_art = None
         self.metadata = {}
         self.queue = [
-            "City Lights Serenade.mp3",
-            "Digital Horizons.mp3",
+            fname for fname in os.listdir("assets/music/") if fname.lower().endswith(('.mp3', '.m4a', '.wav'))
         ]
         self.load_track(self.queue[1])
     def skip_music(self,dir=1):
@@ -44,7 +43,7 @@ class MusicPlayer:
         self.play()
     def play(self):
         if self.current_track:
-            pygame.mixer.music.set_volume(self.volume)
+            pygame.mixer.music.set_volume(self.volume/10)
             pygame.mixer.music.play(-1 if self.loop else 0)
             self.is_playing = True
     def pause(self):
@@ -58,7 +57,6 @@ class MusicPlayer:
         pygame.mixer.music.load(track_file)
         self.current_track = track_name
         self.metadata=MetadataExtractor().extract(track_file)
-        self.cover_art=pygame.image.load(io.BytesIO(self.metadata.get('art', b"")))
         self.artist=self.metadata.get('artist', "Unknown")
         self.album=self.metadata.get('album', "Unknown")
         self.title=self.metadata.get('title', "Unknown")
@@ -69,7 +67,7 @@ class MusicPlayer:
             print(f"Arquivo de som não encontrado: {sounds[sound]}")
             return
         sound = pygame.mixer.Sound(sounds[sound])
-        sound.set_volume(getVars('volume'))
+        sound.set_volume(self.volume/10)
         sound.play()
     def get_progress(self):
         """Retorna o progresso atual da música em porcentagem"""
@@ -85,9 +83,13 @@ class MusicPlayer:
         except Exception as e:
             print(f"Erro ao obter progresso da música: {e}")
         return 0.0
-    def volume_change(self):
-        self.volume = getVars('volume')
-        pygame.mixer.music.set_volume(self.volume)  # Normaliza para 0.0 - 1.0
+    def volume_change(self,increment):
+        self.volume = (getVars('volume') + increment)%11
+        setVars('volume', self.volume)
+        pygame.mixer.music.set_volume(self.volume/10) 
+    def randomize_queue(self):
+        print("Embaralhando fila de músicas")
+        random.shuffle(self.queue)
     
 class MetadataExtractor:
     """Extracts metadata and cover art for supported audio files."""

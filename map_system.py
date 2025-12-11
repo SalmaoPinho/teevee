@@ -8,7 +8,7 @@ from config import DEFS, getVars
 # Configurações do mapa (Hardcoded defaults since config.ini is missing)
 MAP_CONFIG = {
     'min_zoom': 2,
-    'max_zoom': 18,
+    'max_zoom': 19,
     'initial_zoom': 12,
     'tiles_wide': 3,
     'tiles_high': 3,

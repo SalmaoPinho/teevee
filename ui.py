@@ -1,3 +1,4 @@
+import io
 import pygame
 import os
 from config import DICT, DEFS, getVars
@@ -91,7 +92,7 @@ def init_ui_system(width, height, game_clock):
             subelements={
                 "time_display": {
                     'width_percent':0.33,
-                    'font_size_percent':0.05,
+                    'font_size_percent':0.04,
                     'text':"!time_24hr",
                 },
                 "date_display": {
@@ -104,7 +105,7 @@ def init_ui_system(width, height, game_clock):
                 "weekday_display": {
                     'x_percent':0.67,
                     'width_percent':0.33,
-                    'font_size_percent':0.05,
+                    'font_size_percent':0.04,
                     'text':"!week_day",
                 },
             }
@@ -202,9 +203,9 @@ class UElement:
         # Tamanho da fonte proporcional
         font_size = int(PROPSYS.percent_to_px_y(font_size_percent))
         self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
-        self.text_surface = self.font.render(text, True, color)
-        self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         self.text_align = text_align
+        self.text_surface = self._render_text_wrapped(text, color)
+        self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         
         if text_align == 'left':
             self.text_rect.left = self.rect.left *1.1
@@ -218,6 +219,49 @@ class UElement:
         if subelements is not None:
             for subelement_key, subelement_dict in subelements.items():
                 self.add_subelement(subelement_key, subelement_dict)
+
+    def _render_text_wrapped(self, text, color):
+        """Renderiza texto com quebra de linha automática se for muito largo"""
+        words = str(text).split(' ')
+        lines = []
+        current_line = []
+        
+        for word in words:
+            test_line = ' '.join(current_line + [word])
+            test_surface = self.font.render(test_line, True, color)
+            
+            if test_surface.get_width() <= self.rect.width * 0.9:
+                current_line.append(word)
+            else:
+                if current_line:
+                    lines.append(' '.join(current_line))
+                    current_line = [word]
+                else:
+                    lines.append(word)
+        
+        if current_line:
+            lines.append(' '.join(current_line))
+        
+        if not lines:
+            return self.font.render('', True, color)
+        
+        # Renderiza múltiplas linhas
+        line_height = self.font.get_height()
+        total_height = line_height * len(lines)
+        surface = pygame.Surface((self.rect.width, total_height), pygame.SRCALPHA)
+        
+        for i, line in enumerate(lines):
+            line_surface = self.font.render(line, True, color)
+            y_offset = i * line_height
+            
+            if self.text_align == 'left':
+                surface.blit(line_surface, (0, y_offset))
+            elif self.text_align == 'right':
+                surface.blit(line_surface, (self.rect.width - line_surface.get_width(), y_offset))
+            else:  # center
+                surface.blit(line_surface, ((self.rect.width - line_surface.get_width()) // 2, y_offset))
+        
+        return surface
 
     def add_subelement(self, subelement_key, subelement_dict):
         self.subelements[subelement_key] = UElement(
@@ -278,18 +322,32 @@ class UElement:
                         if TV:
                             TV.draw()
                         val = "" # Don't print anything for tv command
-                    elif command=="play":
-                        if glock.player.is_playing:
-                            val = "II"
-                        else:
-                            val = "p"
+                    elif command.startswith("SPRITE_"):
+                        # Generic sprite rendering: SPRITE_<sprite_key>
+                        import graphics
+                        sprite_key = command[7:]  # Remove "SPRITE_" prefix
+                        # Get the sprite
+                        sprite_data = graphics.SPRITE_LOADER.get_sprite(sprite_key)
+                        if sprite_data:
+                            sprite = sprite_data["sprite"]
+                            # Scale sprite to fit button height, increase size if hovering
+                            hover_scale = 1.2 if self.hovering else 1.0
+                            scale_factor = (self.rect.height / sprite.get_height()) * hover_scale
+                            scaled_width = int(sprite.get_width() * scale_factor)
+                            scaled_height = int(sprite.get_height() * scale_factor)
+                            scaled_sprite = pygame.transform.scale(sprite, (scaled_width, scaled_height))
+                            # Center the sprite in the button rect
+                            sprite_rect = scaled_sprite.get_rect(center=self.rect.center)
+                            screen.blit(scaled_sprite, sprite_rect)
+                        val = ""  # Don't print text
                     elif command=="music_display":
-                        img=glock.player.cover_art
-                        surf=pygame.transform.scale(img, (self.rect.height, self.rect.height))
-                        rect=surf.get_rect(center=self.rect.center)
-                        #apply transparency
-                        surf.set_alpha(128)
-                        screen.blit(surf, rect)
+                        if GAME_CLOCK.player.metadata.get('art'):
+                            img=pygame.image.load(io.BytesIO(GAME_CLOCK.player.metadata.get('art', b"")))
+                            surf=pygame.transform.scale(img, (self.rect.height, self.rect.height))
+                            rect=surf.get_rect(center=self.rect.center)
+                            #apply transparency
+                            surf.set_alpha(128)
+                            screen.blit(surf, rect)
                         val = "" 
                     elif command=="music_progress":
                         progress = glock.player.get_progress()
@@ -350,7 +408,7 @@ class UElement:
         self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
         text=self.text if newtext is None else newtext
         color=self.color if not self.inverted_colors else DEFS['bg'] 
-        self.text_surface = self.font.render(str(text), True,color)
+        self.text_surface = self._render_text_wrapped(str(text), color)
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         if self.text_align == 'left':
             self.text_rect.left = self.rect.left *1.1
