@@ -7,7 +7,7 @@ import audio
 from config import getVars, DICT
 
 def get_cpu_temperature():
-    """Get CPU temperature in Celsius"""
+    """Obtém temperatura da CPU em Celsius"""
     try:
         with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
             temp = float(f.read().strip()) / 1000.0
@@ -85,11 +85,11 @@ class Glock:
 
         }
         
-        # Ensure map_status exists
+        # Garante que map_status existe
         if 'map_status' not in self.info:
             self.info['map_status'] = ""
 
-        #refresh info every minute
+        # Atualiza info a cada minuto
         if self.last_minute != now.minute:
             self.refresh_info()
             self.last_minute = now.minute

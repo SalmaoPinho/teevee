@@ -8,7 +8,7 @@ import datetime
 import calendar
 import copy
 
-# --- UI System ---
+# --- Sistema de UI ---
 PROPSYS = None
 GAME_CLOCK = None
 TV = None
@@ -40,8 +40,16 @@ def init_ui_system(width, height, game_clock):
     background_color = DEFS['bg']
     secondary_color = DEFS["sec"]
     
-    # Define User Interface
+    # Define Interface do Usuário
     user_interface.update({
+        "background": UElement(
+            x_percent=0,
+            y_percent=0,
+            width_percent=1,
+            height_percent=1,
+            color=background_color,
+            inverted_colors=True
+        ),
         "top_bar": UElement(
             x_percent=0.125,
             y_percent=0.0625,
@@ -62,6 +70,8 @@ def init_ui_system(width, height, game_clock):
                         "main_title": {
                             'text':"!header",
                             'font_size_percent':0.08,
+                            'inverted_colors':True,
+                            'color':(255,255,255),
                         },
                     }
                 },
@@ -157,6 +167,122 @@ class ProportionalSystem:
             self.percent_to_px_x(width_percent),
             self.percent_to_px_y(height_percent)
         )
+
+def apply_gradient_effect(surface, width, height, base_color, intensity=0.5, opacity=150, border_radius=30):
+    """
+    Aplica efeito de gradiente vertical arredondado em uma superfície
+    
+    Args:
+        surface: Superfície pygame onde aplicar o gradiente
+        width: Largura da área de gradiente
+        height: Altura da área de gradiente
+        base_color: Cor base do elemento
+        intensity: Intensidade do escurecimento (0.0-1.0, padrão 0.5 = 50%)
+        opacity: Opacidade máxima do gradiente (0-255, padrão 150)
+        border_radius: Raio dos cantos arredondados
+    
+    Returns:
+        Superfície com efeito de gradiente aplicado
+    """
+    if width < 10 or height < 10:
+        return surface
+    
+    # Cria superfície para o gradiente
+    gradient_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+    r, g, b = base_color[:3]
+    
+    for i in range(height):
+        # Gradiente de cima para baixo - escurece progressivamente
+        progress = i / height
+        # Escurece a cor base
+        dark_r = int(r * (1 - progress * intensity))
+        dark_g = int(g * (1 - progress * intensity))
+        dark_b = int(b * (1 - progress * intensity))
+        alpha = int(opacity * progress)  # Aumenta opacidade conforme desce
+        
+        pygame.draw.line(gradient_surface, (dark_r, dark_g, dark_b, alpha), 
+                       (0, i), (width, i))
+    
+    # Aplica máscara arredondada ao gradiente
+    gradient_mask = pygame.Surface((width, height), pygame.SRCALPHA)
+    mask_rect = pygame.Rect(0, 0, width, height)
+    pygame.draw.rect(gradient_mask, (255, 255, 255, 255), mask_rect, border_radius=border_radius)
+    gradient_surface.blit(gradient_mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+    
+    # Aplica gradiente na superfície principal
+    surface.blit(gradient_surface, (0, 0))
+    
+    return surface
+
+def apply_shine_effect(surface, width, height, intensity=40, shine_percent=0.3, border_radius=30, offset_y=5, base_color=(255, 255, 255)):
+    """
+    Aplica efeito de brilho arredondado em uma superfície
+    
+    Args:
+        surface: Superfície pygame onde aplicar o brilho
+        width: Largura da área de brilho
+        height: Altura da área de brilho
+        intensity: Intensidade do brilho (0-255)
+        shine_percent: Porcentagem da altura para o brilho (0.0-1.0)
+        border_radius: Raio dos cantos arredondados
+        offset_y: Deslocamento vertical do brilho
+        base_color: Cor base do elemento para adaptar o brilho
+    
+    Returns:
+        Superfície com efeito de brilho aplicado
+    """
+    if width < 20 or height < 10:
+        return surface
+    
+    shine_height = int(height * shine_percent)
+    if shine_height <= 0:
+        return surface
+    
+    # Calcula cor de brilho adaptativa baseada na cor base
+    r, g, b = base_color[:3]
+    brightness = (r + g + b) / 3
+    
+    # Cria superfície para o brilho
+    shine_surface = pygame.Surface((width, shine_height), pygame.SRCALPHA)
+    
+    if brightness < 128:  # Cor escura - usa brilho clarificado
+        # Para cores escuras, desenha gradiente da cor clarificada
+        for i in range(shine_height):
+            # Gradiente que diminui conforme desce
+            progress = i / shine_height
+            alpha = int(intensity * 0.5 * (1 - progress))  # Intensidade reduzida
+            
+            # Clarifica a cor base
+            shine_r = min(255, int(r * 2.5))
+            shine_g = min(255, int(g * 2.5))
+            shine_b = min(255, int(b * 2.5))
+            
+            # Desenha linha do gradiente
+            pygame.draw.line(shine_surface, (shine_r, shine_g, shine_b, alpha), 
+                           (0, i), (width, i))
+    else:  # Cor clara - usa escurecimento sutil
+        # Para cores claras, desenha gradiente escuro para criar profundidade
+        for i in range(shine_height):
+            progress = i / shine_height
+            # Escurecimento sutil que diminui conforme desce
+            alpha = int(intensity * 0.3 * (1 - progress))  # Intensidade mais baixa
+            
+            # Usa preto para escurecer
+            pygame.draw.line(shine_surface, (0, 0, 0, alpha), 
+                           (0, i), (width, i))
+    
+    # Aplica máscara arredondada
+    mask = pygame.Surface((width, shine_height), pygame.SRCALPHA)
+    mask_rect = pygame.Rect(0, 0, width, shine_height * 2)
+    pygame.draw.rect(mask, (255, 255, 255, 255), mask_rect, border_radius=border_radius)
+    shine_surface.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+    
+    # Desenha o brilho na superfície principal
+    surface.blit(shine_surface, (0, offset_y))
+    
+    return surface
+
+
 
 class UElement:
     def __init__(self, x_percent=0, y_percent=0, width_percent=1, height_percent=1, 
@@ -293,12 +419,12 @@ class UElement:
             new_words = []
             for word in words:
                 if '!' in word:
-                    # Handle cases like "Rain: !weather_rain %" where ! is inside
-                    # We need to extract the variable name. Assuming simple !var format
-                    # or !var_name
+                    # Lida com casos como "Rain: !weather_rain %" onde ! está dentro
+                    # Precisamos extrair o nome da variável. Assumindo formato simples !var
+                    # ou !var_name
                     
-                    # Simple approach: if word starts with !, try to replace it
-                    # If it contains !, split by ! and replace the part after
+                    # Abordagem simples: se palavra começa com !, tenta substituir
+                    # Se contém !, divide por ! e substitui a parte depois
                     
                     prefix = ""
                     suffix = ""
@@ -308,8 +434,8 @@ class UElement:
                         parts = word.split('!')
                         prefix = parts[0]
                         command = parts[1]
-                        # Handle potential punctuation after command?
-                        # For now assume clean separation or simple suffix
+                        # Lida com pontuação potencial após comando?
+                        # Por enquanto assume separação limpa ou sufixo simples
                     
                     val = "N/A"
                     if command == 'header':
@@ -323,31 +449,37 @@ class UElement:
                             TV.draw()
                         val = "" # Don't print anything for tv command
                     elif command.startswith("SPRITE_"):
-                        # Generic sprite rendering: SPRITE_<sprite_key>
+                        # Renderização genérica de sprite: SPRITE_<sprite_key>
                         import graphics
-                        sprite_key = command[7:]  # Remove "SPRITE_" prefix
-                        # Get the sprite
+                        sprite_key = command[7:]  # Remove prefixo "SPRITE_"
+                        # Obtém o sprite
                         sprite_data = graphics.SPRITE_LOADER.get_sprite(sprite_key)
                         if sprite_data:
                             sprite = sprite_data["sprite"]
-                            # Scale sprite to fit button height, increase size if hovering
+                            # Escala sprite para caber na altura do botão, aumenta tamanho se hovering
                             hover_scale = 1.2 if self.hovering else 1.0
                             scale_factor = (self.rect.height / sprite.get_height()) * hover_scale
                             scaled_width = int(sprite.get_width() * scale_factor)
                             scaled_height = int(sprite.get_height() * scale_factor)
                             scaled_sprite = pygame.transform.scale(sprite, (scaled_width, scaled_height))
-                            # Center the sprite in the button rect
+                            # Centraliza o sprite no retângulo do botão
                             sprite_rect = scaled_sprite.get_rect(center=self.rect.center)
                             screen.blit(scaled_sprite, sprite_rect)
-                        val = ""  # Don't print text
+                        val = ""  # Não imprime texto
                     elif command=="music_display":
                         if GAME_CLOCK.player.metadata.get('art'):
                             img=pygame.image.load(io.BytesIO(GAME_CLOCK.player.metadata.get('art', b"")))
-                            surf=pygame.transform.scale(img, (self.rect.height, self.rect.height))
-                            rect=surf.get_rect(center=self.rect.center)
-                            #apply transparency
-                            surf.set_alpha(128)
-                            screen.blit(surf, rect)
+                            
+                            # Escala a imagem
+                            img_size = self.rect.height
+                            scaled_img = pygame.transform.scale(img, (img_size, img_size))
+                            
+                            # Aplica transparência
+                            scaled_img.set_alpha(128)
+                            
+                            # Desenha na tela
+                            rect = scaled_img.get_rect(center=self.rect.center)
+                            screen.blit(scaled_img, rect)
                         val = "" 
                     elif command=="music_progress":
                         progress = glock.player.get_progress()
@@ -372,7 +504,7 @@ class UElement:
                             map_surf, source = MAP_SYSTEM.get_static_map(lat, lon)
                             if map_surf:
                                 screen.blit(map_surf, self.rect)
-                        val = "" # Don't print anything for map command
+                        val = "" # Não imprime nada para comando de mapa
                     elif GAME_CLOCK and (command in GAME_CLOCK.vals):
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):
@@ -387,16 +519,71 @@ class UElement:
             if any(w != "" for w in new_words):
                 txt = " ".join(new_words)
             else:
-                txt = "" # If all replacements resulted in empty strings (like map_render), keep it empty
+                txt = "" # Se todas as substituições resultaram em strings vazias (como map_render), mantém vazio
             self.update_font(newtext=txt)
             
         """Desenha o botão na superfície"""
         text_surface= self.text_surface
         if self.background:
             if self.inverted_colors:
-                pygame.draw.rect(screen, self.color, self.rect, border_radius=30)
+                # Cria superfície temporária para efeitos
+                temp_surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+                
+                # Desenha retângulo base com cantos arredondados
+                temp_rect = pygame.Rect(0, 0, self.rect.width, self.rect.height)
+                pygame.draw.rect(temp_surface, self.color, temp_rect, border_radius=30)
+                
+                # Aplica gradiente usando função reutilizável
+                apply_gradient_effect(temp_surface, self.rect.width, self.rect.height, 
+                                    self.color, intensity=0.5, opacity=150, border_radius=30)
+                
+                if self.rect.width < 20:
+                    return
+                # Aplica brilho usando função reutilizável com cor adaptativa
+                apply_shine_effect(temp_surface, self.rect.width, self.rect.height, 
+                                 intensity=40, shine_percent=0.3, border_radius=30, offset_y=5, base_color=self.color)
+                
+                # Adiciona borda interna sutil para definição
+                inner_rect = pygame.Rect(2, 2, self.rect.width - 4, self.rect.height - 4)
+                pygame.draw.rect(temp_surface, (*self.color[:3], 100), inner_rect, 1, border_radius=28)
+                
+                # Desenha na tela
+                screen.blit(temp_surface, self.rect.topleft)
             else:
-                pygame.draw.rect(screen, self.color, self.rect, self.outline_size, border_radius=30)
+                # Cria superfície temporária para efeitos
+                temp_surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+                
+                # Desenha borda externa com brilho
+                temp_rect = pygame.Rect(0, 0, self.rect.width, self.rect.height)
+                
+                # Borda principal
+                pygame.draw.rect(temp_surface, self.color, temp_rect, self.outline_size, border_radius=30)
+                
+                # Aplica brilho usando função reutilizável com cor adaptativa
+                if self.rect.width > self.outline_size * 2:
+                    # Cria superfície temporária para o brilho interno
+                    shine_width = self.rect.width - self.outline_size * 2
+                    shine_height_total = self.rect.height - self.outline_size * 2
+                    inner_shine_surface = pygame.Surface((shine_width, shine_height_total), pygame.SRCALPHA)
+                    
+                    apply_shine_effect(inner_shine_surface, shine_width, shine_height_total,
+                                     intensity=60, shine_percent=0.15, border_radius=25, offset_y=0, base_color=self.color)
+                    
+                    temp_surface.blit(inner_shine_surface, (self.outline_size, self.outline_size))
+                
+                # Adiciona destaque na borda superior (highlight)
+                highlight_thickness = max(1, self.outline_size // 2)
+                highlight_rect = pygame.Rect(self.outline_size, self.outline_size,
+                                            self.rect.width - self.outline_size * 2,
+                                            self.rect.height - self.outline_size * 2)
+                
+                # Cor de destaque (mais clara)
+                highlight_color = tuple(min(255, c + 40) for c in self.color[:3])
+                pygame.draw.rect(temp_surface, (*highlight_color, 80), highlight_rect, 
+                               highlight_thickness, border_radius=25)
+                
+                # Desenha na tela
+                screen.blit(temp_surface, self.rect.topleft)
         screen.blit(text_surface, self.text_rect)
         for subelement_key in self.subelements:
             subelement = self.subelements[subelement_key]
@@ -462,22 +649,22 @@ def generate_calendar_subelements():
     year = now.year
     month = now.month
     
-    # Get number of days in month and start day
+    # Obtém número de dias no mês e dia inicial
     num_days = calendar.monthrange(year, month)[1]
     
     calendar_subs = {}
     
-    # Grid layout: 7 columns (Mon-Sun), 5-6 rows
+    # Layout de grade: 7 colunas (Seg-Dom), 5-6 linhas
     cols = 7
     rows = 6
     
     cell_width = 1.0 / cols
     cell_height = 1.0 / rows
     
-    # Start position (offset for first day of month)
-    # monthrange returns (weekday, days). weekday is 0-6 (Mon-Sun)
-    # We want Sunday to be 0, so we shift by +1 and mod 7
-    # Mon(0)->1, Tue(1)->2, ..., Sat(5)->6, Sun(6)->0
+    # Posição inicial (offset para primeiro dia do mês)
+    # monthrange retorna (weekday, days). weekday é 0-6 (Seg-Dom)
+    # Queremos Domingo como 0, então deslocamos +1 e mod 7
+    # Seg(0)->1, Ter(1)->2, ..., Sáb(5)->6, Dom(6)->0
     start_day = (calendar.monthrange(year, month)[0] + 1) % 7
     
     current_row = 0
@@ -513,24 +700,24 @@ def build_ui():
             'subelements':{},
         }
         
-        # Deep copy vals to avoid modifying the original DICT
+        # Cópia profunda de vals para evitar modificar DICT original
         vals_copy = copy.deepcopy(vals)
         
-        # Inject calendar days if this is the weather panel
+        # Injeta dias do calendário se for painel de clima
         if 'format' in vals_copy and vals_copy['format'] == 'weather':
-            # We need to find the CALENDAR_FRAME in the structure and populate it
-            # The structure is in DICT['format']['weather']
-            # But here we are iterating over contentvals.
-            # The 'vals' here is just {'format': 'weather'}
+            # Precisamos encontrar CALENDAR_FRAME na estrutura e populá-lo
+            # A estrutura está em DICT['format']['weather']
+            # Mas aqui estamos iterando sobre contentvals.
+            # O 'vals' aqui é apenas {'format': 'weather'}
             
-            # We need to modify the loaded format from DICT['format']['weather']
-            # But we can't modify DICT directly or it will persist/duplicate on re-renders if we were to re-render
-            # However, build_ui is called once.
+            # Precisamos modificar o formato carregado de DICT['format']['weather']
+            # Mas não podemos modificar DICT diretamente ou persistirá/duplicará em re-renders se fosséssemos re-renderizar
+            # Porém, build_ui é chamado uma vez.
             
-            # Let's get the weather format
+            # Vamos obter o formato de clima
             weather_format = copy.deepcopy(DICT['format']['weather'])
             
-            # Find CALENDAR_FRAME
+            # Encontra CALENDAR_FRAME
             if 'subelements' in weather_format:
                 if 'WEATHER_DISPLAY' in weather_format['subelements']:
                     if 'subelements' in weather_format['subelements']['WEATHER_DISPLAY']:
@@ -538,17 +725,17 @@ def build_ui():
                             calendar_frame = weather_format['subelements']['WEATHER_DISPLAY']['subelements']['CALENDAR_FRAME']
                             calendar_frame['subelements'] = generate_calendar_subelements()
             
-            # Now use this modified format for this menu item
-            # We need to manually construct the frame content because the loop below expects key-value pairs
-            # that map to subelements.
+            # Agora usa este formato modificado para este item de menu
+            # Precisamos construir manualmente o conteúdo do frame porque o loop abaixo espera pares chave-valor
+            # que mapeiam para subelementos.
             
-            # Actually, the loop below iterates over keys in 'vals'.
-            # For WEATHER, vals is {"format": "weather"}
-            # The loop sees key="format", val="weather"
-            # It checks if 'format' in name (yes) and DICT['format'][val] exists (yes)
-            # Then it sets format=DICT['format'][val]
+            # Na verdade, o loop abaixo itera sobre chaves em 'vals'.
+            # Para WEATHER, vals é {"format": "weather"}
+            # O loop vê key="format", val="weather"
+            # Verifica se 'format' em name (sim) e DICT['format'][val] existe (sim)
+            # Então define format=DICT['format'][val]
             
-            # So we need to intercept this specific case in the loop
+            # Então precisamos interceptar este caso específico no loop
             pass
 
         enums=list(enumerate(vals.items()))
@@ -557,9 +744,9 @@ def build_ui():
             
             if 'format' in name and DICT['format'][val]:
                 if val == 'weather':
-                     # Special handling for weather to inject calendar
+                 # Tratamento especial para clima para injetar calendário
                      format = copy.deepcopy(DICT['format'][val])
-                     # Inject calendar
+                     # Injeta calendário
                      try:
                         format['subelements']['WEATHER_DISPLAY']['subelements']['CALENDAR_FRAME']['subelements'] = generate_calendar_subelements()
                      except KeyError:

@@ -5,7 +5,7 @@ from io import BytesIO
 import threading
 from config import DEFS, getVars
 
-# Configurações do mapa (Hardcoded defaults since config.ini is missing)
+# Configurações do mapa (Valores padrão fixos já que config.ini está faltando)
 MAP_CONFIG = {
     'min_zoom': 2,
     'max_zoom': 19,
@@ -32,7 +32,7 @@ class RobustMap:
             return self.cache[cache_key]
             
         for server in self.tile_servers:
-            for attempt in range(3): # 3 attempts per server
+            for attempt in range(3): # 3 tentativas por servidor
                 try:
                     url = server.format(z=zoom, x=x, y=y)
                     response = requests.get(url, timeout=2, headers={
@@ -53,13 +53,13 @@ class RobustMap:
                     # print(f"[ERROR] Erro no tile {x},{y} (attempt {attempt+1}): {e}")
                     continue
         
-        # Return placeholder if all fails
+        # Retorna placeholder se tudo falhar
         return self._create_placeholder_tile()
 
     def _create_placeholder_tile(self):
         surf = pygame.Surface((256, 256))
-        surf.fill((20, 20, 20)) # Dark gray
-        pygame.draw.rect(surf, (50, 50, 50), (0, 0, 256, 256), 1) # Border
+        surf.fill((20, 20, 20)) # Cinza escuro
+        pygame.draw.rect(surf, (50, 50, 50), (0, 0, 256, 256), 1) # Borda
         pygame.draw.line(surf, (50, 50, 50), (0, 0), (256, 256), 1) # X
         pygame.draw.line(surf, (50, 50, 50), (256, 0), (0, 256), 1)
         return surf
@@ -84,7 +84,7 @@ class MapManager:
         self.is_loading = False
         self.loading_thread = None
         
-        # Optimization: Track last rendered location
+        # Otimização: Rastreia última localização renderizada
         self.last_rendered_lat = None
         self.last_rendered_lon = None
         self.last_rendered_zoom = None
@@ -116,7 +116,7 @@ class MapManager:
     def get_static_map(self, lat, lon):
         """Interface otimizada - não bloqueante"""
         
-        # Check if we need to reload
+        # Verifica se precisa recarregar
         should_reload = False
         
         if self.current_map_surface is None:
@@ -126,7 +126,7 @@ class MapManager:
         elif self.last_rendered_zoom != self.current_zoom:
             should_reload = True
         else:
-            # Check for significant location change (approx 11 meters)
+            # Verifica mudança significativa de localização (aprox 11 metros)
             lat_diff = abs(lat - self.last_rendered_lat)
             lon_diff = abs(lon - self.last_rendered_lon)
             if lat_diff > 0.0001 or lon_diff > 0.0001:
@@ -178,7 +178,7 @@ class MapManager:
             if self.content_area:
                 new_map_surface = pygame.transform.smoothscale(new_map_surface, (self.content_area.width, self.content_area.height))
             
-            # Apply rounded corners
+            # Aplica cantos arredondados
             new_map_surface = self._apply_round_corners(new_map_surface, 20)
             
             self.current_map_surface = new_map_surface
@@ -232,24 +232,24 @@ class MapManager:
         except:
             pass
             
-        # Apply rounded corners
+        # Aplica cantos arredondados
         fallback = self._apply_round_corners(fallback, 20)
         
         return fallback
 
     def _apply_round_corners(self, surface, radius):
-        """Applies rounded corners to a surface"""
+        """Aplica cantos arredondados a uma superfície"""
         rect = surface.get_rect()
         mask = pygame.Surface(rect.size, pygame.SRCALPHA)
         
-        # Draw rounded rectangle on mask
+        # Desenha retângulo arredondado na máscara
         pygame.draw.rect(mask, (255, 255, 255), rect, border_radius=radius)
         
-        # Create a new surface with alpha channel
+        # Cria nova superfície com canal alpha
         new_surface = pygame.Surface(rect.size, pygame.SRCALPHA)
         new_surface.blit(surface, (0, 0))
         
-        # Apply mask
+        # Aplica máscara
         new_surface.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
         
         return new_surface

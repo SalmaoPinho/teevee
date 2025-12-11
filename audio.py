@@ -92,7 +92,7 @@ class MusicPlayer:
         random.shuffle(self.queue)
     
 class MetadataExtractor:
-    """Extracts metadata and cover art for supported audio files."""
+    """Extrai metadados e arte de capa para arquivos de áudio suportados."""
 
     def extract(self, file_path):
         ext = os.path.splitext(file_path)[1].lower()
@@ -166,7 +166,7 @@ class MetadataExtractor:
         else:
             metadata['notice'] = "Install mutagen for wav metadata"
 
-        # Manual RIFF parsing for INFO and embedded ID3
+        # Parsing manual de RIFF para INFO e ID3 embutido
         try:
             with open(file_path, 'rb') as f:
                 header = f.read(12)

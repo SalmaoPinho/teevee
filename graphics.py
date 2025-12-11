@@ -6,7 +6,6 @@ SHEET = None
 PROPSYS = None
 SPRITE_LOADER = None
 crt_texture = None
-crt_overlay = None
 
 def init_graphics(screen, sheet, propsys):
     global SCREEN, SHEET, PROPSYS, SPRITE_LOADER, crt_texture, crt_overlay
@@ -22,7 +21,7 @@ def init_graphics(screen, sheet, propsys):
     scale=DEFS["crtsize"]/16,
     alpha=50
     )
-    # Load control sprites
+    # Carrega sprites de controle
     SPRITE_LOADER.create_sprite(
     key="skip",
     position=(23, 0),
@@ -48,7 +47,7 @@ def init_graphics(screen, sheet, propsys):
     scale=1,
     )
     
-    #weather sprites
+    # Sprites de clima
     SPRITE_LOADER.create_sprite(
     key="temperature",
     position=(43, 26),
@@ -92,7 +91,7 @@ def init_graphics(screen, sheet, propsys):
 class spriteLoader:
     def __init__(self):
         self.sprites = {}
-        # self.ps was missing in original code, assuming it should be the global PROPSYS
+        # self.ps estava faltando no código original, assumindo que deveria ser o PROPSYS global
         
     def create_sprite(self, key, position, size, scale=1.0, alpha=255, angle=0):
         x, y = position
@@ -188,12 +187,12 @@ class TeeVee:
         self.eyes = "open"  # Exemplo de estado dos olhos
         self.mouth = "happy"  # Exemplo de estado emocional
     def draw(self):
-        #frame
+        # Frame
         SPRITE_LOADER.draw_sprite_centered("frame", DEFS['center_x'], DEFS['center_y'])
-        #eyes
+        # Olhos
         SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(6,22),size=(3,5))
         SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(13,22),size=(3,5))
-        #mouth
+        # Boca
         pos1=(6,28)
         self.mouth="happy"
         if self.mouth=="smile":
@@ -215,11 +214,12 @@ class TeeVee:
     
     def draw_rect(self, x, y, w, h, color=(255, 255, 255)):
         """
-        Draws a rectangle relative to the frame.
-        x, y: Position (0-22, 0-36)
-        w, h: Size
+        Desenha um retângulo relativo ao frame.
+        x, y: Posição (0-22, 0-36)
+        w, h: Tamanho
         """
         SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(x, y), size=(w, h), color=color)
+
 def apply_crt_effect():
     # Limpar a overlay
     crt_overlay.fill((0, 0, 0, 0))  # Clear with transparent
@@ -231,3 +231,91 @@ def apply_crt_effect():
             crt_overlay.blit(sprite, (x, y))
     
     return crt_overlay
+
+def apply_barrel_distortion(source_surface, distortion_strength=0.04):
+    """
+    Aplica distorção de barril a uma superfície (efeito CRT) com interpolação suave
+    Otimizado com numpy para melhor performance
+    
+    Args:
+        source_surface: Superfície original
+        distortion_strength: Força da distorção (0.0 = sem distorção, 0.5 = muito curvado)
+    
+    Returns:
+        Nova superfície com distorção aplicada
+    """
+    import math
+    import numpy as np
+    
+    width, height = source_surface.get_size()
+    
+    # Converte superfície para array numpy
+    source_array = pygame.surfarray.array3d(source_surface)
+    
+    # Cria arrays de coordenadas
+    x_coords = np.arange(width)
+    y_coords = np.arange(height)
+    x_grid, y_grid = np.meshgrid(x_coords, y_coords)
+    
+    # Centro da tela
+    center_x = width / 2
+    center_y = height / 2
+    
+    # Calcula distância do centro (normalizada)
+    dx = (x_grid - center_x) / center_x
+    dy = (y_grid - center_y) / center_y
+    distance = np.sqrt(dx**2 + dy**2)
+    
+    # Aplica distorção de barril
+    distortion_factor = 1 + distortion_strength * (distance ** 2)
+    
+    # Calcula novas posições
+    new_dx = dx * distortion_factor
+    new_dy = dy * distortion_factor
+    
+    source_x = center_x + new_dx * center_x
+    source_y = center_y + new_dy * center_y
+    
+    # Interpolação bilinear
+    x0 = np.floor(source_x).astype(int)
+    y0 = np.floor(source_y).astype(int)
+    x1 = x0 + 1
+    y1 = y0 + 1
+    
+    # Pesos para interpolação
+    wx = source_x - x0
+    wy = source_y - y0
+    
+    # Máscara para pixels válidos
+    valid_mask = (x0 >= 0) & (x0 < width - 1) & (y0 >= 0) & (y0 < height - 1)
+    
+    # Cria array de saída
+    distorted_array = np.zeros((height, width, 3), dtype=np.uint8)
+    
+    # Aplica interpolação apenas para pixels válidos
+    for channel in range(3):
+        c00 = source_array[x0[valid_mask], y0[valid_mask], channel]
+        c10 = source_array[x1[valid_mask], y0[valid_mask], channel]
+        c01 = source_array[x0[valid_mask], y1[valid_mask], channel]
+        c11 = source_array[x1[valid_mask], y1[valid_mask], channel]
+        
+        wx_valid = wx[valid_mask]
+        wy_valid = wy[valid_mask]
+        
+        interpolated = (
+            c00 * (1 - wx_valid) * (1 - wy_valid) +
+            c10 * wx_valid * (1 - wy_valid) +
+            c01 * (1 - wx_valid) * wy_valid +
+            c11 * wx_valid * wy_valid
+        )
+        
+        distorted_array[valid_mask, channel] = np.clip(interpolated, 0, 255).astype(np.uint8)
+    
+    # Converte de volta para superfície pygame
+    # Transpõe porque surfarray usa (width, height, channels)
+    distorted_array_transposed = np.transpose(distorted_array, (1, 0, 2))
+    distorted = pygame.surfarray.make_surface(distorted_array_transposed)
+    
+    return distorted
+
+

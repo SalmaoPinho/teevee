@@ -15,7 +15,7 @@ SUPPORTED_EXT = ('.m4a', '.mp3', '.wav', '.ogg')
 
 
 class MetadataExtractor:
-    """Extracts metadata and cover art for supported audio files."""
+    """Extrai metadados e arte de capa para arquivos de áudio suportados."""
 
     def extract(self, file_path):
         ext = os.path.splitext(file_path)[1].lower()
@@ -89,7 +89,7 @@ class MetadataExtractor:
         else:
             metadata['notice'] = "Install mutagen for wav metadata"
 
-        # Manual RIFF parsing for INFO and embedded ID3
+        # Parsing manual de RIFF para INFO e ID3 embutido
         try:
             with open(file_path, 'rb') as f:
                 header = f.read(12)
@@ -251,7 +251,7 @@ class MetadataExtractor:
 
 
 class PlaybackController:
-    """Audio playback and metadata handling without UI concerns."""
+    """Reprodução de áudio e tratamento de metadados sem preocupações de UI."""
 
     def __init__(self, sound_dir=None):
         pygame.mixer.init()
@@ -298,7 +298,7 @@ class PlaybackController:
 
 
 class MusicApp:
-    """Pygame UI wrapper that consumes PlaybackController."""
+    """Wrapper de UI Pygame que consome PlaybackController."""
 
     def __init__(self, controller):
         self.controller = controller

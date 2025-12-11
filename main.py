@@ -9,21 +9,21 @@ import map_system
 # Inicialização
 pygame.init()
 
-# Load Config
+# Carrega Configuração
 DEFS, DICT = config.load_config()
 
-# Setup Screen
+# Configura Tela
 SCREEN = pygame.display.set_mode((int(DEFS['width']), int(DEFS['height'])))
 if DEFS['fullscreen']:
     pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
 pygame.display.set_caption("Euphemeris")
 
-# Load Assets
+# Carrega Assets
 SHEET = pygame.image.load("assets/spritesheet.png").convert_alpha()
 OVERLAY_IMAGE = pygame.image.load("assets/overlay.png").convert_alpha()
 
-# Init Systems
+# Inicializa Sistemas
 GAME_CLOCK = game_clock.Glock()
 ui.init_ui_system(DEFS['width'], DEFS['height'], GAME_CLOCK)
 MAP_SYSTEM = map_system.RealMap(GAME_CLOCK)
@@ -53,7 +53,7 @@ while running:
             for button in buttons:
                 if button.is_clicked(event.pos, event):
                     
-                    #divide button name
+                    # Divide nome do botão
                     parts = button.name.split("_")
                     if parts[0] == "nav":
                         if parts[1] == "next":
@@ -106,11 +106,15 @@ while running:
     userint = ui.render_ui(SCREEN)    
     SCREEN.blit(crt, (0, 0))
     
-    # Scale overlay (casting to int to be safe)
+    # Escala overlay (convertendo para int por segurança)
     OVERLAY_SCALED = pygame.transform.scale(OVERLAY_IMAGE, (int(DEFS['width']), int(DEFS['height'])))
     SCREEN.blit(OVERLAY_SCALED, (0, 0))
     
     GAME_CLOCK.update()
+    
+    # Aplica barrel distortion (efeito CRT final)
+    distorted_screen = graphics.apply_barrel_distortion(SCREEN, distortion_strength=0.05)
+    SCREEN.blit(distorted_screen, (0, 0))
     
     # Atualiza a tela
     pygame.display.flip()
