@@ -7,6 +7,156 @@
             "background": false,
             "font_size_percent": 0.05
         },
+        "config": {
+            "y_percent": 0.05,
+            "height_percent": 0.9,
+            "x_percent": 0.05,
+            "width_percent": 0.9,
+            "background": false,
+            "subelements":{
+                "colorscheme": {
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "Color Scheme",
+                            "width_percent": 0.5,
+                            "font_size_percent": 0.04,
+                            "background":false,
+                            "clickable": true
+                        },
+                        "colorscheme_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "text": "!colorscheme",
+                            "inverted_colors": true
+                        }
+                    }
+                },
+                "backcolor": {
+                    "y_percent": 0.2,
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "Background Scheme",
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "font_size_percent": 0.04,
+                            "background":false
+                        },
+                        "backcolor_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "text": "!colorscheme",
+                            "inverted_colors": true,
+                            "clickable": true
+                        }
+                    }
+                },
+                "fullscreen": {
+                    "width_percent": 0.5,
+                    "y_percent": 0.4,
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "Full -screen",
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "font_size_percent": 0.04,
+                            "background":false
+                        },
+                        "backcolor_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "text": "X",
+                            "clickable": true
+                        }
+                    }
+                },
+                "ctr": {
+                    "x_percent": 0.5,
+                    "width_percent": 0.5,
+                    "y_percent": 0.4,
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "CTR",
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "font_size_percent": 0.04,
+                            "background":false
+                        },
+                        "backcolor_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "text": "X",
+                            "clickable": true
+                        }
+                    }
+                },
+                "scanlines": {
+                    "width_percent": 0.5,
+                    "y_percent": 0.6,
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "Scan -lines",
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "font_size_percent": 0.04,
+                            "background":false
+                        },
+                        "backcolor_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "text": "X",
+                            "clickable": true
+                        }
+                    }
+                },
+                "distortion": {
+                    "x_percent": 0.5,
+                    "width_percent": 0.5,
+                    "y_percent": 0.6,
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "Distor -tion",
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "font_size_percent": 0.04,
+                            "background":false
+                        },
+                        "backcolor_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "text": "X",
+                            "clickable": true
+                        }
+                    }
+                },
+                "overlay": {
+                    "width_percent": 0.5,
+                    "y_percent": 0.8,
+                    "height_percent": 0.2,
+                    "subelements": {
+                        "colorscheme": {
+                            "text": "Overlay",
+                            "width_percent": 0.5,
+                            "clickable": true,
+                            "font_size_percent": 0.04,
+                            "background":false
+                        },
+                        "backcolor_value": {
+                            "x_percent": 0.5,
+                            "width_percent": 0.5,
+                            "text": "X",
+                            "clickable": true
+                        }
+                    }
+                }
+            }
+        },
         "fullstats": {
             "background": false,
             "subelements": {
@@ -521,6 +671,9 @@
         },
         "WEATHER": {
             "format": "weather"
+        },
+        "CONFIG": {
+            "format": "config"
         }
     },
     "lines": {
