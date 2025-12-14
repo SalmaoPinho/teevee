@@ -102,20 +102,22 @@ while running:
     # Limpa a tela
     SCREEN.fill(DEFS['bg'])
     
+    userint = ui.render_ui(SCREEN)   
+    GAME_CLOCK.update() 
     # Desenha a TV    
-    userint = ui.render_ui(SCREEN)    
-    SCREEN.blit(crt, (0, 0))
-    
+    if DEFS['crt']:
+            SCREEN.blit(crt, (0, 0))    
     # Escala overlay (convertendo para int por segurança)
-    OVERLAY_SCALED = pygame.transform.scale(OVERLAY_IMAGE, (int(DEFS['width']), int(DEFS['height'])))
-    SCREEN.blit(OVERLAY_SCALED, (0, 0))
-    
-    GAME_CLOCK.update()
-    
+    if DEFS['overlay']:   
+        OVERLAY_SCALED = pygame.transform.scale(OVERLAY_IMAGE, (int(DEFS['width']), int(DEFS['height'])))
+        SCREEN.blit(OVERLAY_SCALED, (0, 0))
     # Aplica barrel distortion (efeito CRT final)
-    distorted_screen = graphics.apply_barrel_distortion(SCREEN, distortion_strength=0.05)
-    SCREEN.blit(distorted_screen, (0, 0))
-    
+    if DEFS['distortion']:
+        distorted_screen = graphics.apply_barrel_distortion(SCREEN, distortion_strength=0.05)
+        SCREEN.blit(distorted_screen, (0, 0))
+    if DEFS['scanlines']:
+        scanlines = graphics.apply_scanlines(SCREEN, SCREEN.get_rect(), 2, 40, pygame.time.get_ticks() / 50)
+        SCREEN.blit(scanlines, (0, 0))
     # Atualiza a tela
     pygame.display.flip()
     clock.tick(60)

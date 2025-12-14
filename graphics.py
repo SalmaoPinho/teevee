@@ -231,7 +231,20 @@ def apply_crt_effect():
             crt_overlay.blit(sprite, (x, y))
     
     return crt_overlay
-
+def apply_scanlines(surface, rect, spacing=4, intensity=15, offset=0):
+    """Linhas de varredura - efeito retro/CRT com animação"""
+    scanlines = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+    
+    # Offset animado para movimento
+    animated_offset = int(offset) % spacing
+    
+    for y in range(-spacing, rect.height + spacing, spacing):
+        y_pos = y + animated_offset
+        if 0 <= y_pos < rect.height:
+            pygame.draw.line(scanlines, (0, 0, 0, intensity), (0, y_pos), (rect.width, y_pos))
+    
+    surface.blit(scanlines, (0, 0))
+    return surface
 def apply_barrel_distortion(source_surface, distortion_strength=0.04):
     """
     Aplica distorção de barril a uma superfície (efeito CRT) com interpolação suave
