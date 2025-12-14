@@ -505,6 +505,11 @@ class UElement:
                             if map_surf:
                                 screen.blit(map_surf, self.rect)
                         val = "" # Não imprime nada para comando de mapa
+                    elif command.startswith("toggle_"):
+                        # Suporte para variáveis de toggle: toggle_<setting_name>
+                        import config
+                        setting_name = command[7:]  # Remove prefixo "toggle_"
+                        val = config.get_toggle_display(setting_name)
                     elif GAME_CLOCK and (command in GAME_CLOCK.vals):
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):

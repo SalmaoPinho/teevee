@@ -94,6 +94,18 @@ while running:
                             GAME_CLOCK.player.volume_change(1)
                         else:
                             GAME_CLOCK.player.volume_change(-1)
+                            
+                    elif parts[0] == "config":
+                        # Handler para botões de configuração
+                        setting_name = parts[1]  # fullscreen, crt, scanlines, distortion, overlay
+                        config.toggle_setting(setting_name)
+                        # Recarrega DEFS (config.load_config() já atualiza config.DEFS)
+                        # Atualiza a tela se necessário
+                        if setting_name == "fullscreen":
+                            if config.DEFS['fullscreen']:
+                                SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                            else:
+                                SCREEN = pygame.display.set_mode((int(config.DEFS['width']), int(config.DEFS['height'])))
                     print(f"Clicou no botão: {button.name}")
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:

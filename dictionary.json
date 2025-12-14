@@ -13,103 +13,62 @@
             "x_percent": 0.05,
             "width_percent": 0.9,
             "background": false,
-            "subelements":{
-                "colorscheme": {
-                    "height_percent": 0.2,
-                    "subelements": {
-                        "colorscheme": {
-                            "text": "Color Scheme",
-                            "width_percent": 0.5,
-                            "font_size_percent": 0.04,
-                            "background":false,
-                            "clickable": true
-                        },
-                        "colorscheme_value": {
-                            "x_percent": 0.5,
-                            "width_percent": 0.5,
-                            "clickable": true,
-                            "text": "!colorscheme",
-                            "inverted_colors": true
-                        }
-                    }
-                },
-                "backcolor": {
-                    "y_percent": 0.2,
-                    "height_percent": 0.2,
-                    "subelements": {
-                        "colorscheme": {
-                            "text": "Background Scheme",
-                            "width_percent": 0.5,
-                            "clickable": true,
-                            "font_size_percent": 0.04,
-                            "background":false
-                        },
-                        "backcolor_value": {
-                            "x_percent": 0.5,
-                            "width_percent": 0.5,
-                            "text": "!colorscheme",
-                            "inverted_colors": true,
-                            "clickable": true
-                        }
-                    }
-                },
+            "subelements": {
                 "fullscreen": {
                     "width_percent": 0.5,
-                    "y_percent": 0.4,
-                    "height_percent": 0.2,
+                    "height_percent": 0.33,
                     "subelements": {
-                        "colorscheme": {
+                        "fullscreen_label": {
                             "text": "Full -screen",
                             "width_percent": 0.5,
-                            "clickable": true,
                             "font_size_percent": 0.04,
-                            "background":false
+                            "background": false
                         },
-                        "backcolor_value": {
+                        "config_fullscreen": {
+                            "name": "config_fullscreen",
                             "x_percent": 0.5,
                             "width_percent": 0.5,
-                            "text": "X",
+                            "text": "!toggle_fullscreen",
                             "clickable": true
                         }
                     }
                 },
-                "ctr": {
+                "crt": {
                     "x_percent": 0.5,
                     "width_percent": 0.5,
-                    "y_percent": 0.4,
-                    "height_percent": 0.2,
+                    "height_percent": 0.33,
                     "subelements": {
-                        "colorscheme": {
-                            "text": "CTR",
+                        "crt_label": {
+                            "text": "CRT",
                             "width_percent": 0.5,
-                            "clickable": true,
                             "font_size_percent": 0.04,
-                            "background":false
+                            "background": false
                         },
-                        "backcolor_value": {
+                        "config_crt": {
+                            "name": "config_crt",
                             "x_percent": 0.5,
                             "width_percent": 0.5,
-                            "text": "X",
+                            "text": "!toggle_crt",
                             "clickable": true
                         }
                     }
                 },
                 "scanlines": {
                     "width_percent": 0.5,
-                    "y_percent": 0.6,
-                    "height_percent": 0.2,
+                    "y_percent": 0.33,
+                    "height_percent": 0.33,
                     "subelements": {
-                        "colorscheme": {
+                        "scanlines_label": {
                             "text": "Scan -lines",
                             "width_percent": 0.5,
-                            "clickable": true,
                             "font_size_percent": 0.04,
-                            "background":false
+                            "background": false
                         },
-                        "backcolor_value": {
+                        "config_scanlines": {
+                            "name": "config_scanlines",
                             "x_percent": 0.5,
                             "width_percent": 0.5,
-                            "text": "X",
+                            "text": "!toggle_scanlines",
                             "clickable": true
                         }
                     }
@@ -117,40 +76,40 @@
                 "distortion": {
                     "x_percent": 0.5,
                     "width_percent": 0.5,
-                    "y_percent": 0.6,
-                    "height_percent": 0.2,
+                    "y_percent": 0.33,
+                    "height_percent": 0.33,
                     "subelements": {
-                        "colorscheme": {
+                        "distortion_label": {
                             "text": "Distor -tion",
                             "width_percent": 0.5,
-                            "clickable": true,
                             "font_size_percent": 0.04,
-                            "background":false
+                            "background": false
                         },
-                        "backcolor_value": {
+                        "config_distortion": {
+                            "name": "config_distortion",
                             "x_percent": 0.5,
                             "width_percent": 0.5,
-                            "text": "X",
+                            "text": "!toggle_distortion",
                             "clickable": true
                         }
                     }
                 },
                 "overlay": {
                     "width_percent": 0.5,
-                    "y_percent": 0.8,
-                    "height_percent": 0.2,
+                    "y_percent": 0.66,
+                    "height_percent": 0.33,
                     "subelements": {
-                        "colorscheme": {
+                        "overlay_label": {
                             "text": "Overlay",
                             "width_percent": 0.5,
-                            "clickable": true,
                             "font_size_percent": 0.04,
-                            "background":false
+                            "background": false
                         },
-                        "backcolor_value": {
+                        "config_overlay": {
+                            "name": "config_overlay",
                             "x_percent": 0.5,
                             "width_percent": 0.5,
-                            "text": "X",
+                            "text": "!toggle_overlay",
                             "clickable": true
                         }
                     }
@@ -402,7 +361,7 @@
                 }
             }
         },
-         "music": {
+        "music": {
             "subelements": {
                 "MUSIC_VIEW": {
                     "width_percent": 0.25,
@@ -440,7 +399,6 @@
                             "clickable": true,
                             "font_size_percent": 0.04
                         }
-                                        
                     }
                 },
                 "ALBUM_DISPLAY": {
@@ -485,7 +443,6 @@
                                     "width_percent": 0.7,
                                     "y_percent": -0.5,
                                     "height_percent": 0.3,
-
                                     "subelements": {
                                         "progress": {
                                             "width_percent": 0.5,
@@ -517,7 +474,7 @@
         "weather": {
             "subelements": {
                 "WEATHER_DISPLAY": {
-                                "background": false,
+                    "background": false,
                     "x_percent": 0.275,
                     "width_percent": 0.7,
                     "subelements": {
@@ -526,13 +483,13 @@
                             "height_percent": 0.125,
                             "font_size_percent": 0.04
                         },
-                        "DAYS_LEFT" :{
-                                    "text": "!days_left Days\nLeft",
-                                    "y_percent": 0.9,
-                                    "height_percent": 0.1,
-                                    "font_size_percent": 0.04,
-                                    "background": false
-            },
+                        "DAYS_LEFT": {
+                            "text": "!days_left Days\nLeft",
+                            "y_percent": 0.9,
+                            "height_percent": 0.1,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
                         "CALENDAR_DAY": {
                             "y_percent": 0.125,
                             "height_percent": 0.125,
@@ -597,7 +554,6 @@
                                     "width_percent": 0.125,
                                     "font_size_percent": 0.04
                                 }
-
                             }
                         }
                     }
@@ -638,7 +594,6 @@
                                             "text": "!weather_rain %",
                                             "background": false,
                                             "font_size_percent": 0.03
-
                                         }
                                     }
                                 },
