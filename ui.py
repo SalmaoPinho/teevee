@@ -20,6 +20,13 @@ user_interface = {}
 categories = []
 MAP_SYSTEM = None
 
+# --- Sistema de Chat ---
+chat_input = ""
+chat_response = ""
+chat_input_active = False  # Se o campo de input está ativo
+chat_cursor_timer = 0  # Timer para piscar o cursor
+chat_cursor_visible = True  # Se o cursor está visível
+
 def set_tv(tv_instance):
     global TV
     TV = tv_instance
@@ -27,6 +34,7 @@ def set_tv(tv_instance):
 def set_map_system(map_sys):
     global MAP_SYSTEM
     MAP_SYSTEM = map_sys
+
 
 def init_ui_system(width, height, game_clock):
     global PROPSYS, GAME_CLOCK, categories, glock, primary_color, background_color, secondary_color, user_interface
@@ -510,6 +518,24 @@ class UElement:
                         import config
                         setting_name = command[7:]  # Remove prefixo "toggle_"
                         val = config.get_toggle_display(setting_name)
+                    elif command == "chat_input":
+                        # Exibe o texto digitado pelo usuário com cursor piscante
+                        global chat_cursor_timer, chat_cursor_visible
+                        current_time = pygame.time.get_ticks()
+                        
+                        # Atualiza cursor a cada 500ms
+                        if current_time - chat_cursor_timer >= 500:
+                            chat_cursor_timer = current_time
+                            chat_cursor_visible = not chat_cursor_visible
+                        
+                        # Mostra cursor apenas se campo estiver ativo
+                        if chat_input_active and chat_cursor_visible:
+                            val = chat_input + "|"
+                        else:
+                            val = chat_input
+                    elif command == "teevee_response":
+                        # Exibe a resposta do TeeVee
+                        val = chat_response
                     elif GAME_CLOCK and (command in GAME_CLOCK.vals):
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):

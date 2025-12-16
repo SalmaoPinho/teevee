@@ -106,16 +106,44 @@ while running:
                                 SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
                             else:
                                 SCREEN = pygame.display.set_mode((int(config.DEFS['width']), int(config.DEFS['height'])))
+                                
+                    elif parts[0] == "chat":
+                        if parts[1] == "send":
+                            # Envia mensagem e recebe resposta
+                            if ui.chat_input.strip():
+                                ui.chat_response = "exemplo de resposta"
+                                TV.start_talking(ui.chat_response)
+                                ui.chat_input = ""
+                        elif parts[1] == "input":
+                            # Ativa o campo de input
+                            ui.chat_input_active = True
                     print(f"Clicou no botão: {button.name}")
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
+            elif ui.chat_input_active:
+                # Captura texto quando campo está ativo
+                if event.key == pygame.K_RETURN:
+                    # Enter envia mensagem
+                    if ui.chat_input.strip():
+                        ui.chat_response = "exemplo de resposta"
+                        TV.start_talking(ui.chat_response)
+                        ui.chat_input = ""
+                    ui.chat_input_active = False
+                elif event.key == pygame.K_BACKSPACE:
+                    ui.chat_input = ui.chat_input[:-1]
+                elif event.key == pygame.K_ESCAPE:
+                    ui.chat_input_active = False
+        elif event.type == pygame.TEXTINPUT and ui.chat_input_active:
+            # Adiciona caractere digitado
+            ui.chat_input += event.text
     
     # Limpa a tela
     SCREEN.fill(DEFS['bg'])
     
     userint = ui.render_ui(SCREEN)   
-    GAME_CLOCK.update() 
+    GAME_CLOCK.update()
+    TV.update()  # Atualiza animação de fala do TeeVee
     # Desenha a TV    
     if DEFS['crt']:
             SCREEN.blit(crt, (0, 0))    

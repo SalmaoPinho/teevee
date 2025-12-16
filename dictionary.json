@@ -1,11 +1,40 @@
 {
     "format": {
         "subtitle": {
-            "text": "!subtitle",
-            "y_percent": 0.8,
-            "height_percent": 0.2,
             "background": false,
-            "font_size_percent": 0.05
+            "subelements": {
+                "response_text": {
+                    "text": "!teevee_response",
+                    "y_percent": 0.75,
+                    "height_percent": 0.1,
+                    "font_size_percent": 0.04,
+                    "background": false
+                },
+                "input_area": {
+                    "y_percent": 0.85,
+                    "height_percent": 0.15,
+                    "background": false,
+                    "subelements": {
+                        "input_field": {
+                            "width_percent": 0.75,
+                            "text": "!chat_input",
+                            "font_size_percent": 0.04,
+                            "name": "chat_input",
+                            "clickable": true
+
+                        },
+                        "send_button": {
+                            "x_percent": 0.77,
+                            "width_percent": 0.23,
+                            "text": "Send",
+                            "font_size_percent": 0.04,
+                            "clickable": true,
+                            "name": "chat_send",
+                            "inverted_colors": true
+                        }
+                    }
+                }
+            }
         },
         "config": {
             "y_percent": 0.05,

@@ -184,32 +184,94 @@ class TeeVee:
             size=(22, 36),
             scale=DEFS["width"]/100
         )
-        self.eyes = "open"  # Exemplo de estado dos olhos
-        self.mouth = "happy"  # Exemplo de estado emocional
+        self.eyes = "open"
+        self.mouth = "happy"
+        
+        # Sistema de animação de fala
+        self.is_talking = False
+        self.talk_text = ""
+        self.talk_index = 0
+        self.talk_timer = 0
+        self.mouth_open = False
+        self.frame_offset_y = 0  # Offset vertical para movimento do frame
+        self.letter_duration = 100  # Milissegundos por letra
+        
+    def start_talking(self, text):
+        """Inicia a animação de fala com o texto fornecido"""
+        self.is_talking = True
+        self.talk_text = text
+        self.talk_index = 0
+        self.talk_timer = pygame.time.get_ticks()
+        self.mouth_open = False
+        
+    def update(self):
+        """Atualiza a animação de fala"""
+        if not self.is_talking:
+            self.frame_offset_y = 0
+            return
+            
+        current_time = pygame.time.get_ticks()
+        elapsed = current_time - self.talk_timer
+        
+        # Verifica se é hora de avançar para a próxima letra
+        if elapsed >= self.letter_duration:
+            self.talk_timer = current_time
+            self.talk_index += 1
+            
+            # Alterna estado da boca
+            self.mouth_open = not self.mouth_open
+            
+            # Movimento do frame (sobe quando boca abre, desce quando fecha)
+            if self.mouth_open:
+                self.frame_offset_y = -2
+            else:
+                self.frame_offset_y = 2
+            
+            # Verifica se terminou de falar
+            if self.talk_index >= len(self.talk_text):
+                self.is_talking = False
+                self.mouth_open = False
+                self.frame_offset_y = 0
+                self.mouth = "happy"
+                
     def draw(self):
+        # Calcula offset Y baseado na animação
+        center_y = DEFS['center_y']
+        if self.is_talking:
+            # Adiciona pequeno offset durante a fala
+            center_y += self.frame_offset_y / 1000.0  # Converte para porcentagem
+        
         # Frame
-        SPRITE_LOADER.draw_sprite_centered("frame", DEFS['center_x'], DEFS['center_y'])
+        SPRITE_LOADER.draw_sprite_centered("frame", DEFS['center_x'], center_y)
+        
         # Olhos
-        SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(6,22),size=(3,5))
-        SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(13,22),size=(3,5))
-        # Boca
-        pos1=(6,28)
-        self.mouth="happy"
-        if self.mouth=="smile":
-            for (i) in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+i),size=(10-i*2,2))
-        elif self.mouth=="happy":
-            for (i) in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+i),size=(10-i*2,2),outlines=i)
-        elif self.mouth=="sad":
-            for (i) in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+2-i),size=(10-i*2,2),outlines=i)
-        elif self.mouth=="openmouth":
-            for (i) in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i-1, pos1[1]+i-1),size=(12-i*2,1),color=(0,0,0))
-                SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0]+i, pos1[1]+i),size=(10-i*2,1),color=(0,0,0))
-        elif self.mouth=="neutral":
-            SPRITE_LOADER.draw_relative_to_sprite("frame",startpos=(pos1[0], pos1[1]+1),size=(10,1))
+        SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(6,22), size=(3,5))
+        SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(13,22), size=(3,5))
+        
+        # Boca - muda baseado no estado de fala
+        pos1 = (6, 28)
+        
+        if self.is_talking and self.mouth_open:
+            # Boca aberta durante a fala
+            for i in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i-1, pos1[1]+i-1), size=(12-i*2,1), color=(0,0,0))
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,1), color=(0,0,0))
+        elif self.mouth == "smile":
+            for i in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,2))
+        elif self.mouth == "happy":
+            for i in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,2), outlines=i)
+        elif self.mouth == "sad":
+            for i in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+2-i), size=(10-i*2,2), outlines=i)
+        elif self.mouth == "openmouth":
+            for i in range(3):
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i-1, pos1[1]+i-1), size=(12-i*2,1), color=(0,0,0))
+                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,1), color=(0,0,0))
+        elif self.mouth == "neutral":
+            SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0], pos1[1]+1), size=(10,1))
+        
         return True
     
     def draw_rect(self, x, y, w, h, color=(255, 255, 255)):
