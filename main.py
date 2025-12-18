@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 import config
 import graphics
 import ui
@@ -109,11 +110,15 @@ while running:
                                 
                     elif parts[0] == "chat":
                         if parts[1] == "send":
-                            # Envia mensagem e recebe resposta
+                            # Envia mensagem para Ollama processar
                             if ui.chat_input.strip():
-                                ui.chat_response = "exemplo de resposta"
-                                TV.start_talking(ui.chat_response)
+                                # Escreve input para arquivo
+                                with open('input.txt', 'w', encoding='utf-8') as f:
+                                    f.write(ui.chat_input)
+                                
                                 ui.chat_input = ""
+                                ui.chat_response = "Pensando..."
+                                ui.waiting_for_response = True
                         elif parts[1] == "input":
                             # Ativa o campo de input
                             ui.chat_input_active = True
@@ -126,9 +131,13 @@ while running:
                 if event.key == pygame.K_RETURN:
                     # Enter envia mensagem
                     if ui.chat_input.strip():
-                        ui.chat_response = "exemplo de resposta"
-                        TV.start_talking(ui.chat_response)
+                        # Escreve input para arquivo
+                        with open('input.txt', 'w', encoding='utf-8') as f:
+                            f.write(ui.chat_input)
+                        
                         ui.chat_input = ""
+                        ui.chat_response = "Pensando..."
+                        ui.waiting_for_response = True
                     ui.chat_input_active = False
                 elif event.key == pygame.K_BACKSPACE:
                     ui.chat_input = ui.chat_input[:-1]
@@ -137,6 +146,21 @@ while running:
         elif event.type == pygame.TEXTINPUT and ui.chat_input_active:
             # Adiciona caractere digitado
             ui.chat_input += event.text
+    
+    # Verifica se há resposta do Ollama
+    if ui.waiting_for_response and os.path.exists('response.txt'):
+        try:
+            with open('response.txt', 'r', encoding='utf-8') as f:
+                ui.chat_response = f.read().strip()
+            
+            # Inicia animação de fala
+            TV.start_talking(ui.chat_response)
+            
+            # Remove arquivo de resposta
+            os.remove('response.txt')
+            ui.waiting_for_response = False
+        except Exception as e:
+            print(f"Erro ao ler resposta: {e}")
     
     # Limpa a tela
     SCREEN.fill(DEFS['bg'])

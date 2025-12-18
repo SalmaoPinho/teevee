@@ -26,6 +26,7 @@ chat_response = ""
 chat_input_active = False  # Se o campo de input está ativo
 chat_cursor_timer = 0  # Timer para piscar o cursor
 chat_cursor_visible = True  # Se o cursor está visível
+waiting_for_response = False  # Se está esperando resposta do Ollama
 
 def set_tv(tv_instance):
     global TV
