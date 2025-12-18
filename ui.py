@@ -535,8 +535,11 @@ class UElement:
                         else:
                             val = chat_input
                     elif command == "teevee_response":
-                        # Exibe a resposta do TeeVee
-                        val = chat_response
+                        # Exibe a resposta do TeeVee ou mensagem de espera
+                        if waiting_for_response:
+                            val = "Pensando..."
+                        else:
+                            val = chat_response if chat_response else ""
                     elif GAME_CLOCK and (command in GAME_CLOCK.vals):
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):

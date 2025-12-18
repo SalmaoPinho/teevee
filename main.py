@@ -29,7 +29,7 @@ GAME_CLOCK = game_clock.Glock()
 ui.init_ui_system(DEFS['width'], DEFS['height'], GAME_CLOCK)
 MAP_SYSTEM = map_system.RealMap(GAME_CLOCK)
 ui.set_map_system(MAP_SYSTEM)
-SPRITE_LOADER = graphics.init_graphics(SCREEN, SHEET, ui.PROPSYS)
+SPRITE_LOADER = graphics.init_graphics(SCREEN, SHEET, ui.PROPSYS, GAME_CLOCK)
 
 clock = pygame.time.Clock()
 global TV
@@ -112,12 +112,15 @@ while running:
                         if parts[1] == "send":
                             # Envia mensagem para Ollama processar
                             if ui.chat_input.strip():
+                                # Remove resposta antiga se existir
+                                if os.path.exists('response.txt'):
+                                    os.remove('response.txt')
+                                
                                 # Escreve input para arquivo
                                 with open('input.txt', 'w', encoding='utf-8') as f:
                                     f.write(ui.chat_input)
                                 
                                 ui.chat_input = ""
-                                ui.chat_response = "Pensando..."
                                 ui.waiting_for_response = True
                         elif parts[1] == "input":
                             # Ativa o campo de input
@@ -131,12 +134,15 @@ while running:
                 if event.key == pygame.K_RETURN:
                     # Enter envia mensagem
                     if ui.chat_input.strip():
+                        # Remove resposta antiga se existir
+                        if os.path.exists('response.txt'):
+                            os.remove('response.txt')
+                        
                         # Escreve input para arquivo
                         with open('input.txt', 'w', encoding='utf-8') as f:
                             f.write(ui.chat_input)
                         
                         ui.chat_input = ""
-                        ui.chat_response = "Pensando..."
                         ui.waiting_for_response = True
                     ui.chat_input_active = False
                 elif event.key == pygame.K_BACKSPACE:

@@ -7,10 +7,11 @@ PROPSYS = None
 SPRITE_LOADER = None
 crt_texture = None
 
-def init_graphics(screen, sheet, propsys):
-    global SCREEN, SHEET, PROPSYS, SPRITE_LOADER, crt_texture, crt_overlay
+def init_graphics(screen, sheet, propsys,glock):
+    global SCREEN, SHEET, PROPSYS, SPRITE_LOADER, crt_texture, crt_overlay, GLOCK
     SCREEN = screen
     SHEET = sheet
+    GLOCK = glock
     PROPSYS = propsys
     SPRITE_LOADER = spriteLoader()
     crt_overlay = pygame.Surface((int(DEFS['width']), int(DEFS['height'])), pygame.SRCALPHA)
@@ -252,6 +253,7 @@ class TeeVee:
         pos1 = (6, 28)
         
         if self.is_talking and self.mouth_open:
+            GLOCK.player.play_sound("talk")
             # Boca aberta durante a fala
             for i in range(3):
                 SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i-1, pos1[1]+i-1), size=(12-i*2,1), color=(0,0,0))
@@ -271,6 +273,7 @@ class TeeVee:
                 SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,1), color=(0,0,0))
         elif self.mouth == "neutral":
             SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0], pos1[1]+1), size=(10,1))
+        
         
         return True
     
