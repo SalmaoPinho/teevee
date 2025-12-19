@@ -28,6 +28,11 @@ chat_cursor_timer = 0  # Timer para piscar o cursor
 chat_cursor_visible = True  # Se o cursor está visível
 waiting_for_response = False  # Se está esperando resposta do Ollama
 
+# --- Sistema de Paginação ---
+response_pages = []  # Lista de páginas da resposta
+current_page = 0     # Página atual (0-indexed)
+max_chars_per_page = 150  # Caracteres por página
+
 def set_tv(tv_instance):
     global TV
     TV = tv_instance
@@ -35,6 +40,32 @@ def set_tv(tv_instance):
 def set_map_system(map_sys):
     global MAP_SYSTEM
     MAP_SYSTEM = map_sys
+
+def split_response_into_pages(text, max_chars=150):
+    """Divide texto em páginas de tamanho máximo, respeitando palavras"""
+    if len(text) <= max_chars:
+        return [text]
+    
+    pages = []
+    words = text.split()
+    current_page = ""
+    
+    for word in words:
+        # Tenta adicionar palavra à página atual
+        test_page = current_page + word + " "
+        if len(test_page) <= max_chars:
+            current_page = test_page
+        else:
+            # Página cheia, salva e começa nova
+            if current_page:
+                pages.append(current_page.strip())
+            current_page = word + " "
+    
+    # Adiciona última página
+    if current_page:
+        pages.append(current_page.strip())
+    
+    return pages if pages else [text]
 
 
 def init_ui_system(width, height, game_clock):
@@ -524,14 +555,14 @@ class UElement:
                         global chat_cursor_timer, chat_cursor_visible
                         current_time = pygame.time.get_ticks()
                         
-                        # Atualiza cursor a cada 500ms
+                        # Atualiza cursor a cada 500ms (pisca a cada meio segundo)
                         if current_time - chat_cursor_timer >= 500:
                             chat_cursor_timer = current_time
                             chat_cursor_visible = not chat_cursor_visible
                         
-                        # Mostra cursor apenas se campo estiver ativo
+                        # Mostra cursor "I" apenas se campo estiver ativo
                         if chat_input_active and chat_cursor_visible:
-                            val = chat_input + "|"
+                            val = chat_input + " I"  # Cursor "I" com espaço
                         else:
                             val = chat_input
                     elif command == "teevee_response":
@@ -540,6 +571,24 @@ class UElement:
                             val = "Pensando..."
                         else:
                             val = chat_response if chat_response else ""
+                    elif command == "page_indicator":
+                        # Exibe indicador de página (ex: <1/3>)
+                        if response_pages and len(response_pages) > 1:
+                            val = f"<{current_page + 1}/{len(response_pages)}>"
+                        else:
+                            val = ""
+                    elif command == "page_prev_arrow":
+                        # Exibe seta anterior apenas se houver múltiplas páginas
+                        if response_pages and len(response_pages) > 1:
+                            val = "<"
+                        else:
+                            val = ""
+                    elif command == "page_next_arrow":
+                        # Exibe seta próxima apenas se houver múltiplas páginas
+                        if response_pages and len(response_pages) > 1:
+                            val = ">"
+                        else:
+                            val = ""
                     elif GAME_CLOCK and (command in GAME_CLOCK.vals):
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):

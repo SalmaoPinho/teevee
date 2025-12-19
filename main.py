@@ -125,6 +125,17 @@ while running:
                         elif parts[1] == "input":
                             # Ativa o campo de input
                             ui.chat_input_active = True
+                            
+                    elif parts[0] == "response":
+                        # Navegação entre páginas da resposta
+                        if parts[1] == "prev" and ui.current_page > 0:
+                            ui.current_page -= 1
+                            ui.chat_response = ui.response_pages[ui.current_page]
+                            TV.start_talking(ui.chat_response)
+                        elif parts[1] == "next" and ui.current_page < len(ui.response_pages) - 1:
+                            ui.current_page += 1
+                            ui.chat_response = ui.response_pages[ui.current_page]
+                            TV.start_talking(ui.chat_response)
                     print(f"Clicou no botão: {button.name}")
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -157,7 +168,12 @@ while running:
     if ui.waiting_for_response and os.path.exists('response.txt'):
         try:
             with open('response.txt', 'r', encoding='utf-8') as f:
-                ui.chat_response = f.read().strip()
+                full_response = f.read().strip()
+            
+            # Divide resposta em páginas
+            ui.response_pages = ui.split_response_into_pages(full_response, ui.max_chars_per_page)
+            ui.current_page = 0
+            ui.chat_response = ui.response_pages[0] if ui.response_pages else ""
             
             # Inicia animação de fala
             TV.start_talking(ui.chat_response)

@@ -3,12 +3,47 @@
         "subtitle": {
             "background": false,
             "subelements": {
-                "response_text": {
-                    "text": "!teevee_response",
-                    "y_percent": 0.75,
-                    "height_percent": 0.1,
-                    "font_size_percent": 0.04,
-                    "background": false
+                "response_area": {
+                    "y_percent": 0.7,
+                    "height_percent": 0.15,
+                    "background": false,
+                    "subelements": {
+                        "response_text": {
+                            "text": "!teevee_response",
+                            "height_percent": 0.7,
+                            "font_size_percent": 0.04,
+                            "background": false
+                        },
+                        "pagination": {
+                            "y_percent": 0.7,
+                            "height_percent": 0.3,
+                            "background": false,
+                            "subelements": {
+                                "page_prev": {
+                                    "width_percent": 0.2,
+                                    "text": "!page_prev_arrow",
+                                    "font_size_percent": 0.06,
+                                    "clickable": true,
+                                    "name": "response_prev"
+                                },
+                                "page_indicator": {
+                                    "x_percent": 0.2,
+                                    "width_percent": 0.6,
+                                    "text": "!page_indicator",
+                                    "font_size_percent": 0.03,
+                                    "background": false
+                                },
+                                "page_next": {
+                                    "x_percent": 0.8,
+                                    "width_percent": 0.2,
+                                    "text": "!page_next_arrow",
+                                    "font_size_percent": 0.06,
+                                    "clickable": true,
+                                    "name": "response_next"
+                                }
+                            }
+                        }
+                    }
                 },
                 "input_area": {
                     "y_percent": 0.85,
@@ -21,7 +56,6 @@
                             "font_size_percent": 0.04,
                             "name": "chat_input",
                             "clickable": true
-
                         },
                         "send_button": {
                             "x_percent": 0.77,
