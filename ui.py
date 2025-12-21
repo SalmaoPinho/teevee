@@ -577,18 +577,6 @@ class UElement:
                             val = f"<{current_page + 1}/{len(response_pages)}>"
                         else:
                             val = ""
-                    elif command == "page_prev_arrow":
-                        # Exibe seta anterior apenas se houver múltiplas páginas
-                        if response_pages and len(response_pages) > 1:
-                            val = "<"
-                        else:
-                            val = ""
-                    elif command == "page_next_arrow":
-                        # Exibe seta próxima apenas se houver múltiplas páginas
-                        if response_pages and len(response_pages) > 1:
-                            val = ">"
-                        else:
-                            val = ""
                     elif GAME_CLOCK and (command in GAME_CLOCK.vals):
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):

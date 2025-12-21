@@ -177,13 +177,13 @@ class TeeVee:
             key="frame",
             position=(0, 0),
             size=(22, 36),
-            scale=DEFS["width"]/100
+            scale=DEFS["width"]/150
         )
         SPRITE_LOADER.create_sprite(
             key="mouths",
             position=(0, 0),
             size=(22, 36),
-            scale=DEFS["width"]/100
+            scale=DEFS["width"]/150
         )
         self.eyes = "open"
         self.mouth = "happy"

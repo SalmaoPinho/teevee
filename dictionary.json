@@ -4,8 +4,8 @@
             "background": false,
             "subelements": {
                 "response_area": {
-                    "y_percent": 0.7,
-                    "height_percent": 0.15,
+                    "y_percent": 0.55,
+                    "height_percent": 0.3,
                     "background": false,
                     "subelements": {
                         "response_text": {
@@ -21,7 +21,7 @@
                             "subelements": {
                                 "page_prev": {
                                     "width_percent": 0.2,
-                                    "text": "!page_prev_arrow",
+                                    "text": "<",
                                     "font_size_percent": 0.06,
                                     "clickable": true,
                                     "name": "response_prev"
@@ -30,13 +30,13 @@
                                     "x_percent": 0.2,
                                     "width_percent": 0.6,
                                     "text": "!page_indicator",
-                                    "font_size_percent": 0.03,
+                                    "font_size_percent": 0.04,
                                     "background": false
                                 },
                                 "page_next": {
                                     "x_percent": 0.8,
                                     "width_percent": 0.2,
-                                    "text": "!page_next_arrow",
+                                    "text": ">",
                                     "font_size_percent": 0.06,
                                     "clickable": true,
                                     "name": "response_next"
