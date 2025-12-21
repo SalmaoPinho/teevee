@@ -152,7 +152,7 @@ while running:
                         # Escreve input para arquivo
                         with open('input.txt', 'w', encoding='utf-8') as f:
                             f.write(ui.chat_input)
-                        
+                        TV.mouth="mouth_skeptic"
                         ui.chat_input = ""
                         ui.waiting_for_response = True
                     ui.chat_input_active = False

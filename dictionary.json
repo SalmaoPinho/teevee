@@ -18,6 +18,7 @@
                             "y_percent": 0.7,
                             "height_percent": 0.3,
                             "background": false,
+                            "visible": false,
                             "subelements": {
                                 "page_prev": {
                                     "width_percent": 0.2,

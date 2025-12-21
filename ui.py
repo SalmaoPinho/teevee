@@ -19,7 +19,7 @@ secondary_color = None
 user_interface = {}
 categories = []
 MAP_SYSTEM = None
-
+font="assets/fonts/Jersey10.ttf"
 # --- Sistema de Chat ---
 chat_input = ""
 chat_response = ""
@@ -368,8 +368,8 @@ class UElement:
         self.background = background
         # Tamanho da fonte proporcional
         font_size = int(PROPSYS.percent_to_px_y(font_size_percent))
-        self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
-        self.text_align = text_align
+        self.font = pygame.font.Font(font, font_size*2)
+        self.text_align = text_align    
         self.text_surface = self._render_text_wrapped(text, color)
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         
@@ -569,6 +569,7 @@ class UElement:
                         # Exibe a resposta do TeeVee ou mensagem de espera
                         if waiting_for_response:
                             val = "Pensando..."
+                            
                         else:
                             val = chat_response if chat_response else ""
                     elif command == "page_indicator":
@@ -664,7 +665,7 @@ class UElement:
     def update_font(self, scale=1,newtext=None):
         # Atualiza fonte
         font_size = int(PROPSYS.percent_to_px_y(self.font_size_percent*scale))
-        self.font = pygame.font.Font("assets/fonts/bmspace.ttf", font_size)
+        self.font = pygame.font.Font(font, font_size)
         text=self.text if newtext is None else newtext
         color=self.color if not self.inverted_colors else DEFS['bg'] 
         self.text_surface = self._render_text_wrapped(str(text), color)

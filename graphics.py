@@ -67,7 +67,7 @@ def init_graphics(screen, sheet, propsys,glock):
     )
     SPRITE_LOADER.create_sprite(
     key="net",
-    position=(14, 36),
+    position=(15, 36),
     size=(29, 24),
     )
     SPRITE_LOADER.create_sprite(
@@ -126,10 +126,10 @@ class spriteLoader:
         if sprite:
             x = PROPSYS.percent_to_px_x(x_percent)
             y = PROPSYS.percent_to_px_y(y_percent)
-            SCREEN.blit(sprite, (x, y))
+            SCREEN.blit(sprite['sprite'], (x, y))
             return True
         return False
-    def draw_sprite_centered(self, key, x_percent, y_percent):
+    def draw_sprite_centered(self, key, x_percent=0.5, y_percent=0.5):
         """Desenha sprite centralizado nas coordenadas proporcionais"""
         sprite = self.sprites.get(key)["sprite"]
         if sprite:
@@ -172,22 +172,73 @@ class spriteLoader:
 
 class TeeVee:
     def __init__(self):
-        
+        scal=DEFS["width"]/150
         SPRITE_LOADER.create_sprite(
             key="frame",
             position=(0, 0),
             size=(22, 36),
-            scale=DEFS["width"]/150
+            scale=scal
         )
         SPRITE_LOADER.create_sprite(
-            key="mouths",
-            position=(0, 0),
-            size=(22, 36),
-            scale=DEFS["width"]/150
+            key="mouth_smile",
+            position=(161, 0),
+            size=(10, 3),
+            scale=scal
+
         )
-        self.eyes = "open"
-        self.mouth = "happy"
-        
+        SPRITE_LOADER.create_sprite(
+            key="mouth_open",
+            position=(161, 3),
+            size=(10, 3),
+            scale=scal
+
+        )
+        SPRITE_LOADER.create_sprite(
+            key="mouth_sad",
+            position=(161, 6),
+            size=(10, 3),
+            scale=scal
+
+        )
+        SPRITE_LOADER.create_sprite(
+            key="mouth_frown",
+            position=(161, 9),
+            size=(10, 3),
+            scale=scal
+
+        )
+        SPRITE_LOADER.create_sprite(
+            key="mouth_skeptic",
+            position=(161, 12),
+            size=(10, 3),
+            scale=scal
+        )
+        SPRITE_LOADER.create_sprite(
+            key="mouth_midopen",
+            position=(161, 15),
+            size=(10, 3),
+            scale=scal
+        )
+        SPRITE_LOADER.create_sprite(
+            key="eye_open",
+            position=(171, 0),
+            size=(3, 5),
+            scale=scal
+        )
+        SPRITE_LOADER.create_sprite(
+            key="eye_angry",
+            position=(171, 5),
+            size=(3, 5),
+            scale=scal
+        )
+        SPRITE_LOADER.create_sprite(
+            key="eye_closed",
+            position=(171, 0),
+            size=(3, 1),
+            scale=scal
+        )
+        self.eyes = "eye_closed"
+        self.mouth = "mouth_smile"
         # Sistema de animação de fala
         self.is_talking = False
         self.talk_text = ""
@@ -197,43 +248,114 @@ class TeeVee:
         self.frame_offset_y = 0  # Offset vertical para movimento do frame
         self.letter_duration = 100  # Milissegundos por letra
         
+        # Sistema de movimento dos olhos (segue o mouse)
+        self.eye_offset_x = 0  # Offset horizontal dos olhos (-1, 0, 1)
+        self.eye_offset_y = 0  # Offset vertical dos olhos (-1, 0, 1)
+        
+        # Sistema de detecção de movimento frenético (tontura)
+        self.mouse_movements = []  # Lista de posições recentes do mouse
+        self.is_dizzy = False  # Se está tonto
+        self.dizzy_timer = 0  # Timer para duração da tontura
+        self.dizzy_duration = 3000  # Fica tonto por 3 segundos
+        self.movement_threshold = 10  # Número de movimentos rápidos para ficar tonto (reduzido de 15)
+        
     def start_talking(self, text):
         """Inicia a animação de fala com o texto fornecido"""
         self.is_talking = True
         self.talk_text = text
         self.talk_index = 0
         self.talk_timer = pygame.time.get_ticks()
-        self.mouth_open = False
+        self.mouth = "mouth_open"
         
     def update(self):
-        """Atualiza a animação de fala"""
-        if not self.is_talking:
+        """Atualiza a animação de fala e movimento dos olhos"""
+        # Atualiza animação de fala
+        if self.is_talking:
+            current_time = pygame.time.get_ticks()
+            elapsed = current_time - self.talk_timer
+            
+            if elapsed >= self.letter_duration:
+                self.talk_timer = current_time
+                self.talk_index += 1
+                
+                self.mouth_open = not self.mouth_open
+                
+                if self.mouth_open:
+                    self.frame_offset_y = -2
+                else:
+                    self.frame_offset_y = 2
+                
+                if self.talk_index >= len(self.talk_text):
+                    self.is_talking = False
+                    self.mouth_open = False
+                    self.frame_offset_y = 0
+                    self.mouth = "mouth_smile"
+        else:
             self.frame_offset_y = 0
-            return
-            
-        current_time = pygame.time.get_ticks()
-        elapsed = current_time - self.talk_timer
         
-        # Verifica se é hora de avançar para a próxima letra
-        if elapsed >= self.letter_duration:
-            self.talk_timer = current_time
-            self.talk_index += 1
+        # Atualiza movimento dos olhos para seguir o mouse
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        screen_width = DEFS['width']
+        screen_height = DEFS['height']
+        
+        # Calcula posição do TeeVee na tela
+        tv_x = DEFS['center_x'] * screen_width
+        tv_y = DEFS['center_y'] * screen_height
+        
+        # Calcula diferença entre mouse e TeeVee
+        dx = mouse_x - tv_x
+        dy = mouse_y - tv_y
+        
+        # Detecta movimento frenético do mouse
+        current_time = pygame.time.get_ticks()
+        
+        # Adiciona posição atual à lista com timestamp
+        self.mouse_movements.append((mouse_x, mouse_y, current_time))
+        
+        # Remove movimentos antigos (mais de 1 segundo)
+        self.mouse_movements = [(x, y, t) for x, y, t in self.mouse_movements if current_time - t < 1000]
+        
+        # Verifica se há movimento frenético (muitas mudanças de direção)
+        if len(self.mouse_movements) >= self.movement_threshold and not self.is_dizzy:
+            # Calcula distância total percorrida
+            total_distance = 0
+            for i in range(1, len(self.mouse_movements)):
+                x1, y1, _ = self.mouse_movements[i-1]
+                x2, y2, _ = self.mouse_movements[i]
+                total_distance += abs(x2 - x1) + abs(y2 - y1)
             
-            # Alterna estado da boca
-            self.mouth_open = not self.mouth_open
+            # Se percorreu muita distância em pouco tempo, fica tonto
+            # Reduzido de 2x para 1x a largura da tela
+            if total_distance > screen_width * 2.0:
+                self.is_dizzy = True
+                
+                self.dizzy_timer = current_time
+                self.mouse_movements = []  # Limpa lista
+                print(f"🌀 TeeVee ficou TONTO! Distância: {total_distance:.0f}px")
+        
+        # Verifica se deve sair do estado tonto
+        if self.is_dizzy and current_time - self.dizzy_timer >= self.dizzy_duration:
+            self.is_dizzy = False
+        
+        # Se está tonto, não segue o mouse (olhos ficam parados com raiva)
+        if not self.is_dizzy:
+            # Define offset horizontal baseado na posição do mouse
+            # Divide a tela em 3 zonas: esquerda (-1), centro (0), direita (1)
+            if dx < -screen_width * 0.15:  # Mouse à esquerda
+                self.eye_offset_x = -1
+            elif dx > screen_width * 0.15:  # Mouse à direita
+                self.eye_offset_x = 1
+            else:  # Mouse no centro
+                self.eye_offset_x = 0
             
-            # Movimento do frame (sobe quando boca abre, desce quando fecha)
-            if self.mouth_open:
-                self.frame_offset_y = -2
-            else:
-                self.frame_offset_y = 2
-            
-            # Verifica se terminou de falar
-            if self.talk_index >= len(self.talk_text):
-                self.is_talking = False
-                self.mouth_open = False
-                self.frame_offset_y = 0
-                self.mouth = "happy"
+            # Define offset vertical baseado na posição do mouse
+            # Divide a tela em 3 zonas: cima (-1), centro (0), baixo (1)
+            if dy < -screen_height * 0.15:  # Mouse acima
+                self.eye_offset_y = -1
+            elif dy > screen_height * 0.15:  # Mouse abaixo
+                self.eye_offset_y = 1
+            else:  # Mouse no centro
+                self.eye_offset_y = 0
                 
     def draw(self):
         # Calcula offset Y baseado na animação
@@ -245,35 +367,41 @@ class TeeVee:
         # Frame
         SPRITE_LOADER.draw_sprite_centered("frame", DEFS['center_x'], center_y)
         
-        # Olhos
-        SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(6,22), size=(3,5))
-        SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(13,22), size=(3,5))
+        # Olhos com movimento horizontal
+        center_y += 0.058
         
-        # Boca - muda baseado no estado de fala
-        pos1 = (6, 28)
+        # Se está tonto, usa olhos de raiva
+        if self.is_dizzy:
+            self.eyes = "eye_closed"
+        # Senão, pisca normalmente
+        elif pygame.time.get_ticks() % 5000 < 200:
+            self.eyes = "eye_closed"
+        else:
+            self.eyes = "eye_open"
         
-        if self.is_talking and self.mouth_open:
-            GLOCK.player.play_sound("talk")
-            # Boca aberta durante a fala
-            for i in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i-1, pos1[1]+i-1), size=(12-i*2,1), color=(0,0,0))
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,1), color=(0,0,0))
-        elif self.mouth == "smile":
-            for i in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,2))
-        elif self.mouth == "happy":
-            for i in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,2), outlines=i)
-        elif self.mouth == "sad":
-            for i in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+2-i), size=(10-i*2,2), outlines=i)
-        elif self.mouth == "openmouth":
-            for i in range(3):
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i-1, pos1[1]+i-1), size=(12-i*2,1), color=(0,0,0))
-                SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0]+i, pos1[1]+i), size=(10-i*2,1), color=(0,0,0))
-        elif self.mouth == "neutral":
-            SPRITE_LOADER.draw_relative_to_sprite("frame", startpos=(pos1[0], pos1[1]+1), size=(10,1))
+        # Aplica offset horizontal e vertical para movimento dos olhos
+        eye_center_x = 0.475 + (self.eye_offset_x * 0.01)  # Offset de 1% por unidade
+        eye_center_y = center_y + (self.eye_offset_y * 0.005)  # Offset vertical
+        SPRITE_LOADER.draw_sprite_centered(self.eyes, eye_center_x, eye_center_y)
         
+        # Olho esquerdo - pisca diferente, mas também fica com raiva quando tonto
+        if self.is_dizzy:
+            leye = "eye_closed"
+        elif pygame.time.get_ticks() % 7000 < 200:
+            leye = "eye_closed"
+        else:
+            leye = self.eyes
+        # Aplica mesmo offset ao olho esquerdo
+        left_eye_center_x = 0.525 + (self.eye_offset_x * 0.01)
+        left_eye_center_y = center_y + (self.eye_offset_y * 0.005)
+        SPRITE_LOADER.draw_sprite_centered(leye, left_eye_center_x, left_eye_center_y)
+        center_y+=0.052
+        if self.is_talking:
+            self.mouth="mouth_midopen" if self.mouth_open else "mouth_open"
+            if not self.mouth_open:           
+                GLOCK.player.play_sound("talk")
+
+        SPRITE_LOADER.draw_sprite_centered(self.mouth,0.5,center_y)
         
         return True
     
