@@ -4,15 +4,45 @@ import psutil
 import urllib
 import random
 import audio
+import platform
 from config import getVars, DICT
 
 def get_cpu_temperature():
-    """Obtém temperatura da CPU em Celsius"""
+    """Obtém temperatura da CPU em Celsius (cross-platform)"""
+    system = platform.system()
+    
     try:
-        with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
-            temp = float(f.read().strip()) / 1000.0
-        return temp
-    except:
+        # Linux - lê de /sys/class/thermal
+        if system == "Linux":
+            with open('/sys/class/thermal/thermal_zone0/temp', 'r') as f:
+                temp = float(f.read().strip()) / 1000.0
+            return round(temp, 1)
+        
+        # Windows - usa psutil sensors (se disponível)
+        elif system == "Windows":
+            if hasattr(psutil, "sensors_temperatures"):
+                temps = psutil.sensors_temperatures()
+                if temps:
+                    # Tenta diferentes sensores comuns no Windows
+                    for name in ['coretemp', 'cpu_thermal', 'acpitz']:
+                        if name in temps and temps[name]:
+                            return round(temps[name][0].current, 1)
+            # Fallback: retorna "N/A" se não conseguir ler
+            return "N/A"
+        
+        # macOS - usa psutil sensors
+        elif system == "Darwin":
+            if hasattr(psutil, "sensors_temperatures"):
+                temps = psutil.sensors_temperatures()
+                if temps and 'cpu_thermal' in temps:
+                    return round(temps['cpu_thermal'][0].current, 1)
+            return "N/A"
+        
+        else:
+            return "N/A"
+            
+    except Exception as e:
+        # Em caso de erro, retorna N/A silenciosamente
         return "N/A"
 def get_random_line():
     return random.choice(DICT['lines']['eng'])

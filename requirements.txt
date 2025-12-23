@@ -1,0 +1,13 @@
+# TeeVee - Requisitos do Projeto
+
+# Core
+pygame==2.6.1
+
+# System Information (cross-platform)
+psutil>=5.9.0
+
+# Ollama (opcional - para chat com IA)
+ollama>=0.1.0
+
+# Utilitários
+Pillow>=10.0.0  # Para processamento de imagens (se necessário)
