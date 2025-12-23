@@ -177,7 +177,14 @@
                             "clickable": true
                         }
                     }
-                }
+                },
+                                    "CONFIG_TV": {
+                            "x_percent": 0.5,
+                            "y_percent": 1.075,
+                            "height_percent": 0.2,
+                            "text": "!tv",
+                            "background": false
+                    }
             }
         },
         "fullstats": {
@@ -343,13 +350,21 @@
                             "background": false
                         }
                     }
+                },
+                                "CPU_TV": {
+                            "x_percent": 0.5,
+                            "y_percent": 0.4,
+                            "height_percent": 0.2,
+                            "text": "!tv",
+                            "background": false
                 }
             }
         },
         "tvstage": {
             "text": "!tv",
             "background": false,
-            "y_percent": 0,
+            "x_percent": 0.5,
+            "y_percent": 0.35,
             "height_percent": 0.8,
             "font_size_percent": 0.05
         },
@@ -422,7 +437,15 @@
                             "text": "!map_render"
                         }
                     }
-                }
+                },
+                                        "MAP_TV": {
+                            "x_percent": 0.5,
+                            "y_percent": 1.025,
+                            "height_percent": 0.2,
+                            "text": "!tv",
+                            "background": false
+                        }
+
             }
         },
         "music": {
@@ -454,13 +477,6 @@
                             "height_percent": 0.2,
                             "text": "!music_volume",
                             "font_size_percent": 0.04
-                        },
-                        "MUSIC_TV": {
-                            "x_percent": 0.8,
-                            "y_percent": 0.275,
-                            "height_percent": 0.2,
-                            "text": "!tv",
-                            "background": false
                         },
                         "music_queue": {
                             "y_percent": 0.475,
@@ -539,7 +555,14 @@
                             }
                         }
                     }
-                }
+                },
+                        "MUSIC_TV": {
+                            "x_percent": 0.5,
+                            "y_percent": 1.025,
+                            "height_percent": 0.2,
+                            "text": "!tv",
+                            "background": false
+                        }
             }
         },
         "weather": {
@@ -677,8 +700,16 @@
                             }
                         }
                     }
+                },
+                "WEATHER_TV": {
+                            "x_percent": 0.5,
+                            "y_percent": 1.025,
+                            "height_percent": 0.2,
+                            "text": "!tv",
+                            "background": false
                 }
             }
+
         }
     },
     "contentvals": {

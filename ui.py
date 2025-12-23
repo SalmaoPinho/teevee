@@ -145,13 +145,7 @@ def init_ui_system(width, height, game_clock):
                     'font_size_percent':0.04,
                     'text':"!time_24hr",
                 },
-                "date_display": {
-                    'x_percent':0.33,
-                    'width_percent':0.33,
-                    'font_size_percent':0.0425,
-                    'text':"!short_date",
-                    'background':False,
-                },
+
                 "weekday_display": {
                     'x_percent':0.67,
                     'width_percent':0.33,
@@ -486,7 +480,7 @@ class UElement:
                             val="Error"
                     elif command=="tv":
                         if TV:
-                            TV.draw()
+                            TV.draw(self.x_percent,self.y_percent,)
                         val = "" # Don't print anything for tv command
                     elif command.startswith("SPRITE_"):
                         # Renderização genérica de sprite: SPRITE_<sprite_key>

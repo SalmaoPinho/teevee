@@ -357,15 +357,16 @@ class TeeVee:
             else:  # Mouse no centro
                 self.eye_offset_y = 0
                 
-    def draw(self):
+    def draw(self,x_percent,y_percent):
         # Calcula offset Y baseado na animação
-        center_y = DEFS['center_y']
+        center_y = y_percent
+        center_x = x_percent
         if self.is_talking:
             # Adiciona pequeno offset durante a fala
             center_y += self.frame_offset_y / 1000.0  # Converte para porcentagem
         
         # Frame
-        SPRITE_LOADER.draw_sprite_centered("frame", DEFS['center_x'], center_y)
+        SPRITE_LOADER.draw_sprite_centered("frame", x_percent, center_y)
         
         # Olhos com movimento horizontal
         center_y += 0.058
@@ -380,7 +381,7 @@ class TeeVee:
             self.eyes = "eye_open"
         
         # Aplica offset horizontal e vertical para movimento dos olhos
-        eye_center_x = 0.475 + (self.eye_offset_x * 0.01)  # Offset de 1% por unidade
+        eye_center_x = center_x-0.025 + (self.eye_offset_x * 0.01)  # Offset de 1% por unidade
         eye_center_y = center_y + (self.eye_offset_y * 0.005)  # Offset vertical
         SPRITE_LOADER.draw_sprite_centered(self.eyes, eye_center_x, eye_center_y)
         
@@ -392,7 +393,7 @@ class TeeVee:
         else:
             leye = self.eyes
         # Aplica mesmo offset ao olho esquerdo
-        left_eye_center_x = 0.525 + (self.eye_offset_x * 0.01)
+        left_eye_center_x = center_x+0.025 + (self.eye_offset_x * 0.01)
         left_eye_center_y = center_y + (self.eye_offset_y * 0.005)
         SPRITE_LOADER.draw_sprite_centered(leye, left_eye_center_x, left_eye_center_y)
         center_y+=0.052
@@ -401,7 +402,7 @@ class TeeVee:
             if not self.mouth_open:           
                 GLOCK.player.play_sound("talk")
 
-        SPRITE_LOADER.draw_sprite_centered(self.mouth,0.5,center_y)
+        SPRITE_LOADER.draw_sprite_centered(self.mouth,center_x,center_y)
         
         return True
     
