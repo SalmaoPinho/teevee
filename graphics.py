@@ -240,6 +240,8 @@ class TeeVee:
         self.eyes = "eye_closed"
         self.mouth = "mouth_smile"
         # Sistema de animação de fala
+        self.x_percent = 0.5
+        self.y_percent = 0.35
         self.is_talking = False
         self.talk_text = ""
         self.talk_index = 0
@@ -299,8 +301,8 @@ class TeeVee:
         screen_height = DEFS['height']
         
         # Calcula posição do TeeVee na tela
-        tv_x = DEFS['center_x'] * screen_width
-        tv_y = DEFS['center_y'] * screen_height
+        tv_x = self.x_percent * screen_width
+        tv_y = self.y_percent * screen_height
         
         # Calcula diferença entre mouse e TeeVee
         dx = mouse_x - tv_x

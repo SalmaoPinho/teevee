@@ -36,6 +36,19 @@ global TV
 TV = graphics.TeeVee()
 ui.set_tv(TV)
 
+# Saudação inicial baseada no horário
+import datetime
+hour = datetime.datetime.now().hour
+if 5 <= hour < 12:
+    greeting = "Olá, bom dia!"
+elif 12 <= hour < 18:
+    greeting = "Olá, boa tarde!"
+else:
+    greeting = "Olá, boa noite!"
+
+ui.chat_response = greeting  # Exibe no chat
+TV.start_talking(greeting)   # TeeVee fala
+
 crt = graphics.apply_crt_effect()
 buttons = ui.clickable_elements()
 
