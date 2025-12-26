@@ -139,6 +139,7 @@ def init_ui_system(width, height, game_clock):
             width_percent=0.75,
             height_percent=0.125,
             color=primary_color,
+            background=False,
             subelements={
                 "time_display": {
                     'width_percent':0.33,
@@ -363,7 +364,8 @@ class UElement:
         # Tamanho da fonte proporcional
         font_size = int(PROPSYS.percent_to_px_y(font_size_percent))
         self.font = pygame.font.Font(font, font_size*2)
-        self.text_align = text_align    
+        self.text_align = text_align
+        color = color if not inverted_colors else DEFS['bg']
         self.text_surface = self._render_text_wrapped(text, color)
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         
@@ -659,7 +661,7 @@ class UElement:
     def update_font(self, scale=1,newtext=None):
         # Atualiza fonte
         font_size = int(PROPSYS.percent_to_px_y(self.font_size_percent*scale))
-        self.font = pygame.font.Font(font, font_size)
+        self.font = pygame.font.Font(font, font_size*2)
         text=self.text if newtext is None else newtext
         color=self.color if not self.inverted_colors else DEFS['bg'] 
         self.text_surface = self._render_text_wrapped(str(text), color)

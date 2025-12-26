@@ -83,7 +83,7 @@ def init_graphics(screen, sheet, propsys,glock):
     SPRITE_LOADER.create_sprite(
     key="shuffle",
     position=(117, 0),
-    size=(46, 34),
+    size=(42, 34),
     angle=90,
     )
     
