@@ -20,11 +20,11 @@ if DEFS['fullscreen']:
 
 pygame.display.set_caption("Euphemeris")
 
-# Carrega Assets
+# Carrega assets
 SHEET = pygame.image.load("assets/spritesheet.png").convert_alpha()
 OVERLAY_IMAGE = pygame.image.load("assets/overlay.png").convert_alpha()
 
-# Inicializa Sistemas
+# Inicializa sistemas
 GAME_CLOCK = game_clock.Glock()
 ui.init_ui_system(DEFS['width'], DEFS['height'], GAME_CLOCK)
 MAP_SYSTEM = map_system.RealMap(GAME_CLOCK)

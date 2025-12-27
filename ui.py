@@ -73,14 +73,14 @@ def init_ui_system(width, height, game_clock):
     PROPSYS = ProportionalSystem(width, height)
     GAME_CLOCK = game_clock
     
-    # Initialize globals that depend on config
+    # Inicializa globais que dependem do config
     categories[:] = list(DICT['contentvals'].keys())
     glock = Glock()
     primary_color = DEFS['pri']
     background_color = DEFS['bg']
     secondary_color = DEFS["sec"]
     
-    # Define Interface do Usuário
+    # Define interface do usuário
     user_interface.update({
         "background": UElement(
             x_percent=0,

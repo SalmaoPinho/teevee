@@ -92,7 +92,7 @@ def init_graphics(screen, sheet, propsys,glock):
 class spriteLoader:
     def __init__(self):
         self.sprites = {}
-        # self.ps estava faltando no código original, assumindo que deveria ser o PROPSYS global
+        # Assume que deveria ser o PROPSYS global
         
     def create_sprite(self, key, position, size, scale=1.0, alpha=255, angle=0):
         x, y = position
