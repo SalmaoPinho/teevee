@@ -32,6 +32,9 @@
 - Python 3.11 ou superior
 - Pygame 2.6.1
 - psutil 5.9.0+
+- requests 2.31.0+
+- numpy 1.24.0+
+- mutagen 1.47.0+
 - Ollama (opcional, para chat com IA)
 
 ### Instalação Rápida
@@ -48,13 +51,44 @@ pip install -r requirements.txt
 python start.py
 ```
 
+### Instalação no Raspberry Pi 5
+
+```bash
+# Atualize o sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instale dependências do sistema
+sudo apt install python3-pip python3-pygame -y
+
+# Clone e instale
+git clone https://github.com/SalmaoPinho/teevee.git
+cd teevee
+pip3 install -r requirements.txt
+
+# Execute
+python3 start.py
+```
+
 ### Instalação do Ollama (Opcional)
 
-Para usar o chat com IA:
+**Windows/macOS:**
+1. Baixe em: https://ollama.ai
+2. Instale o executável
+3. Execute: `ollama pull llama2`
 
-1. Instale o Ollama: https://ollama.ai
-2. Execute o handler: `python ollama_handler.py`
-3. Digite mensagens no campo de input do TeeVee
+**Linux/Raspberry Pi:**
+```bash
+# Instale Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Baixe um modelo
+ollama pull llama2
+
+# Execute o handler (em terminal separado)
+python ollama_handler.py
+```
+
+**Nota**: O Ollama requer ~4GB de RAM. No Raspberry Pi 5, use modelos menores como `tinyllama`.
 
 ## 🎮 Uso
 
