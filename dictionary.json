@@ -178,13 +178,13 @@
                         }
                     }
                 },
-                                    "CONFIG_TV": {
-                            "x_percent": 0.5,
-                            "y_percent": 1.075,
-                            "height_percent": 0.2,
-                            "text": "!tv",
-                            "background": false
-                    }
+                "CONFIG_TV": {
+                    "x_percent": 0.5,
+                    "y_percent": 1.075,
+                    "height_percent": 0.2,
+                    "text": "!tv",
+                    "background": false
+                }
             }
         },
         "fullstats": {
@@ -351,12 +351,12 @@
                         }
                     }
                 },
-                                "CPU_TV": {
-                            "x_percent": 0.5,
-                            "y_percent": 0.4,
-                            "height_percent": 0.2,
-                            "text": "!tv",
-                            "background": false
+                "CPU_TV": {
+                    "x_percent": 0.5,
+                    "y_percent": 0.4,
+                    "height_percent": 0.2,
+                    "text": "!tv",
+                    "background": false
                 }
             }
         },
@@ -438,14 +438,20 @@
                         }
                     }
                 },
-                                        "MAP_TV": {
-                            "x_percent": 0.5,
-                            "y_percent": 1.025,
-                            "height_percent": 0.2,
-                            "text": "!tv",
-                            "background": false
-                        }
-
+                "cpu_temp_display": {
+                    "x_percent": 0.75,
+                    "width_percent": 0.25,
+                    "font_size_percent": 0.04,
+                    "text": "!cpu_temp_bar%",
+                    "background": false
+                },
+                "MAP_TV": {
+                    "x_percent": 0.5,
+                    "y_percent": 1.025,
+                    "height_percent": 0.2,
+                    "text": "!tv",
+                    "background": false
+                }
             }
         },
         "music": {
@@ -556,13 +562,13 @@
                         }
                     }
                 },
-                        "MUSIC_TV": {
-                            "x_percent": 0.5,
-                            "y_percent": 1.025,
-                            "height_percent": 0.2,
-                            "text": "!tv",
-                            "background": false
-                        }
+                "MUSIC_TV": {
+                    "x_percent": 0.5,
+                    "y_percent": 1.025,
+                    "height_percent": 0.2,
+                    "text": "!tv",
+                    "background": false
+                }
             }
         },
         "weather": {
@@ -702,14 +708,13 @@
                     }
                 },
                 "WEATHER_TV": {
-                            "x_percent": 0.5,
-                            "y_percent": 1.025,
-                            "height_percent": 0.2,
-                            "text": "!tv",
-                            "background": false
+                    "x_percent": 0.5,
+                    "y_percent": 1.025,
+                    "height_percent": 0.2,
+                    "text": "!tv",
+                    "background": false
                 }
             }
-
         }
     },
     "contentvals": {

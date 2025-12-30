@@ -370,8 +370,18 @@ class TeeVee:
         # Frame
         SPRITE_LOADER.draw_sprite_centered("frame", x_percent, center_y)
         
+        # Calcula offsets proporcionais ao tamanho da tela
+        # Sprite do frame tem 22x36 pixels
+        # Valores originais que funcionavam: eye_y=0.058, mouth_y=0.052, eye_x=0.025
+        # Esses valores são para uma tela de referência, vamos escalar proporcionalmente
+        
+        # Usa valores fixos que funcionam bem em todas as resoluções
+        eye_offset_y = 0.058
+        mouth_offset_from_eyes = 0.052
+        eye_offset_x = 0.025
+        
         # Olhos com movimento horizontal
-        center_y += 0.058
+        center_y += eye_offset_y
         
         # Se está tonto, usa olhos de raiva
         if self.is_dizzy:
@@ -383,7 +393,7 @@ class TeeVee:
             self.eyes = "eye_open"
         
         # Aplica offset horizontal e vertical para movimento dos olhos
-        eye_center_x = center_x-0.025 + (self.eye_offset_x * 0.01)  # Offset de 1% por unidade
+        eye_center_x = center_x - eye_offset_x + (self.eye_offset_x * 0.01)  # Offset de 1% por unidade
         eye_center_y = center_y + (self.eye_offset_y * 0.005)  # Offset vertical
         SPRITE_LOADER.draw_sprite_centered(self.eyes, eye_center_x, eye_center_y)
         
@@ -395,16 +405,20 @@ class TeeVee:
         else:
             leye = self.eyes
         # Aplica mesmo offset ao olho esquerdo
-        left_eye_center_x = center_x+0.025 + (self.eye_offset_x * 0.01)
+        left_eye_center_x = center_x + eye_offset_x + (self.eye_offset_x * 0.01)
         left_eye_center_y = center_y + (self.eye_offset_y * 0.005)
         SPRITE_LOADER.draw_sprite_centered(leye, left_eye_center_x, left_eye_center_y)
-        center_y+=0.052
+        
+        # Posiciona boca abaixo dos olhos
+        mouth_y = center_y + mouth_offset_from_eyes
         if self.is_talking:
+            # Adiciona offset de animação
+            mouth_y += self.frame_offset_y / 1000.0
             self.mouth="mouth_midopen" if self.mouth_open else "mouth_open"
             if not self.mouth_open:           
                 GLOCK.player.play_sound("talk")
 
-        SPRITE_LOADER.draw_sprite_centered(self.mouth,center_x,center_y)
+        SPRITE_LOADER.draw_sprite_centered(self.mouth, center_x, mouth_y)
         
         return True
     
