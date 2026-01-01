@@ -504,18 +504,36 @@ class UElement:
                         val = ""  # Não imprime texto
                     elif command=="music_display":
                         if GAME_CLOCK.player.metadata.get('art'):
-                            img=pygame.image.load(io.BytesIO(GAME_CLOCK.player.metadata.get('art', b"")))
+                            try:
+                                # Tenta carregar com pygame primeiro
+                                img = pygame.image.load(io.BytesIO(GAME_CLOCK.player.metadata.get('art', b"")))
+                            except Exception as e:
+                                # Fallback: usa PIL/Pillow (melhor suporte no Raspberry Pi)
+                                try:
+                                    from PIL import Image
+                                    pil_img = Image.open(io.BytesIO(GAME_CLOCK.player.metadata.get('art', b"")))
+                                    # Converte PIL para pygame surface
+                                    mode = pil_img.mode
+                                    size = pil_img.size
+                                    data = pil_img.tobytes()
+                                    
+                                    img = pygame.image.fromstring(data, size, mode)
+                                except Exception as e2:
+                                    print(f"Erro ao decodificar imagem do álbum (pygame): {e}")
+                                    print(f"Erro ao decodificar imagem do álbum (PIL): {e2}")
+                                    img = None
                             
-                            # Escala a imagem
-                            img_size = self.rect.height
-                            scaled_img = pygame.transform.scale(img, (img_size, img_size))
-                            
-                            # Aplica transparência
-                            scaled_img.set_alpha(128)
-                            
-                            # Desenha na tela
-                            rect = scaled_img.get_rect(center=self.rect.center)
-                            screen.blit(scaled_img, rect)
+                            if img:
+                                # Escala a imagem
+                                img_size = self.rect.height
+                                scaled_img = pygame.transform.scale(img, (img_size, img_size))
+                                
+                                # Aplica transparência
+                                scaled_img.set_alpha(128)
+                                
+                                # Desenha na tela
+                                rect = scaled_img.get_rect(center=self.rect.center)
+                                screen.blit(scaled_img, rect)
                         val = "" 
                     elif command=="music_progress":
                         progress = glock.player.get_progress()

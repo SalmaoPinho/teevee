@@ -52,12 +52,22 @@ class Glock:
         self.info={}
         self.last_minute=None
         self.player=audio.MusicPlayer()
+        # Inicializa monitoramento de CPU (importante para Raspberry Pi)
+        psutil.cpu_percent(interval=None)  # Primeira chamada para inicializar
         self.update()
     def refresh_info(self):
         net = psutil.net_io_counters()
         disk= psutil.disk_usage('/')
         memory= psutil.virtual_memory()
         loc=self.get_real_location()
+        
+        # Obtém uso da CPU (não bloqueante)
+        # No Raspberry Pi, interval=0.1 pode retornar 0 na primeira chamada
+        # Usa interval=None para pegar o valor desde a última chamada
+        cpu_usage = psutil.cpu_percent(interval=None)
+        if cpu_usage == 0.0:
+            # Fallback: força uma medição rápida
+            cpu_usage = psutil.cpu_percent(interval=0.1)
         
         # Obtém temperatura da CPU
         cpu_temp = get_cpu_temperature()
@@ -66,7 +76,6 @@ class Glock:
         # Normaliza temperatura para barra visual
         if cpu_temp == "N/A":
             # Simula temperatura baseada no uso da CPU (para sistemas sem sensor)
-            cpu_usage = psutil.cpu_percent(interval=0.1)
             # 0% uso = 30°C, 100% uso = 70°C
             simulated_temp = 30 + (cpu_usage * 0.4)
             cpu_temp = round(simulated_temp, 1)
@@ -82,7 +91,7 @@ class Glock:
             'subtitle': get_random_line(),
             'cpu_temp': cpu_temp,
             'cpu_temp_bar': cpu_temp_bar,
-            'cpu_usage': psutil.cpu_percent(interval=0.1),
+            'cpu_usage': cpu_usage,
             'cpu_freq': int(psutil.cpu_freq().current) if psutil.cpu_freq() else "N/A",
             'disk_total': round(disk.total / (1024**3), 2),      # GB
             'disk_used': round(disk.used / (1024**3), 2),        # GB
