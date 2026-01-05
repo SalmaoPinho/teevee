@@ -6,6 +6,12 @@
 
 **Ephemeris** é um sistema interativo retro-futurista com estética CRT, apresentando o TeeVee - um assistente virtual animado com personalidade própria.
 
+## 🎬 Demonstração em Vídeo
+
+[![Assista à demonstração completa](https://img.youtube.com/vi/8klSwrvdfrk/maxresdefault.jpg)](https://www.youtube.com/watch?v=8klSwrvdfrk)
+
+*▶️ Clique na imagem acima para assistir ao vídeo completo no YouTube*
+
 ## 📺 Características
 
 ### Interface Retro

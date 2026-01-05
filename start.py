@@ -23,7 +23,7 @@ def main():
         response = input("\nContinuar mesmo assim? (s/n): ")
         if response.lower() != 's':
             return
-    
+         
     print("\n" + "="*60)
     print("Iniciando processos...")
     print("="*60)
