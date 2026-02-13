@@ -1,113 +1,166 @@
+"""
+Ollama Handler Simplificado
+Roda como thread em background, sem terminal separado
+"""
 import time
 import os
+import threading
 
 try:
     import ollama
     OLLAMA_AVAILABLE = True
 except ImportError:
     OLLAMA_AVAILABLE = False
-    print("Ollama não instalado. Execute: pip install ollama")
+    print("[OLLAMA] Não instalado. Execute: pip install ollama")
 
-# Rastreia última modificação do arquivo
-last_processed_time = 0
-
-def process_message():
-    """Processa mensagens do input.txt e gera respostas via Ollama"""
-    global last_processed_time
+class OllamaHandler:
+    """Handler simplificado que roda em background thread"""
     
-    if not OLLAMA_AVAILABLE:
-        # Mesmo sem Ollama, processa para não deixar arquivo pendente
-        if os.path.exists('input.txt'):
+    def __init__(self):
+        self.running = False
+        self.thread = None
+        self.last_processed_time = 0
+    
+    def start(self):
+        """Inicia o handler em background"""
+        if self.running:
+            print("[OLLAMA] Handler já está rodando")
+            return
+        
+        self.running = True
+        self.thread = threading.Thread(target=self._run_loop, daemon=True)
+        self.thread.start()
+        print("[OLLAMA] Handler iniciado em background")
+    
+    def stop(self):
+        """Para o handler"""
+        self.running = False
+        if self.thread:
+            self.thread.join(timeout=2)
+        print("[OLLAMA] Handler parado")
+    
+    def _run_loop(self):
+        """Loop principal do handler"""
+        while self.running:
             try:
-                with open('input.txt', 'r', encoding='utf-8') as f:
-                    message = f.read().strip()
-                
-                if message:
-                    print(f"[SEM OLLAMA] Mensagem recebida: {message}")
-                    with open('response.txt', 'w', encoding='utf-8') as f:
-                        f.write("Ollama não está instalado. Execute: pip install ollama")
-                    os.remove('input.txt')
+                self._process_message()
             except Exception as e:
-                print(f"Erro: {e}")
-        return
+                print(f"[OLLAMA] Erro no handler: {e}")
+            
+            # Aguarda 100ms antes de verificar novamente
+            time.sleep(0.1)
     
-    if os.path.exists('input.txt'):
+    def _process_message(self):
+        """Processa mensagens do input.txt"""
+        if not OLLAMA_AVAILABLE:
+            # Sem Ollama, apenas limpa arquivo pendente
+            if os.path.exists('input.txt'):
+                try:
+                    with open('input.txt', 'r', encoding='utf-8') as f:
+                        message = f.read().strip()
+                    
+                    if message:
+                        with open('response.txt', 'w', encoding='utf-8') as f:
+                            f.write("Ollama não está instalado.")
+                        os.remove('input.txt')
+                except Exception:
+                    pass
+            return
+        
+        if not os.path.exists('input.txt'):
+            return
+        
         try:
-            # Verifica se o arquivo foi modificado desde a última vez
+            # Verifica se arquivo foi modificado
             current_mtime = os.path.getmtime('input.txt')
             
-            if current_mtime <= last_processed_time:
+            if current_mtime <= self.last_processed_time:
                 return  # Já processado
             
-            # Lê mensagem do usuário
+            # Lê mensagem
             with open('input.txt', 'r', encoding='utf-8') as f:
                 message = f.read().strip()
             
-            if message:
-                print(f"\n{'='*50}")
-                print(f"📨 Mensagem recebida: {message}")
-                print(f"{'='*50}")
-                
-                # Chama Ollama
-                print("🤖 Chamando Ollama...")
-                response = ollama.chat(model='llama3.2', messages=[
+            if not message:
+                return
+            
+            print(f"\n[OLLAMA] 📨 Mensagem: {message}")
+            
+            # Gera resposta via Ollama
+            response = ollama.chat(
+                model='llama3.2',
+                messages=[
                     {
                         'role': 'system',
-                        'content': 'Você é um assistente amigável e conciso. Responda de forma breve e direta em português.'
+                        'content': 'You are a helpful assistant. Be concise and friendly.'
                     },
                     {
                         'role': 'user',
                         'content': message
                     }
-                ])
-                
-                # Escreve resposta
-                response_text = response['message']['content']
-                print(f"✅ Resposta gerada: {response_text[:100]}...")
-                
-                with open('response.txt', 'w', encoding='utf-8') as f:
-                    f.write(response_text)
-                
-                print(f"💾 Resposta salva em response.txt")
-                print(f"{'='*50}\n")
-                
-                # Atualiza timestamp e remove input
-                last_processed_time = current_mtime
-                os.remove('input.txt')
-        
-        except Exception as e:
-            print(f"❌ Erro ao processar: {e}")
-            # Em caso de erro, escreve mensagem padrão
+                ]
+            )
+            
+            answer = response['message']['content']
+            print(f"[OLLAMA] 💬 Resposta: {answer[:100]}...")
+            
+            # Salva resposta
             with open('response.txt', 'w', encoding='utf-8') as f:
-                f.write(f"Desculpe, ocorreu um erro: {str(e)}")
+                f.write(answer)
+            
+            # Remove input
+            os.remove('input.txt')
+            
+            # Atualiza timestamp
+            self.last_processed_time = current_mtime
+            
+        except Exception as e:
+            print(f"[OLLAMA] Erro ao processar: {e}")
+            # Remove input mesmo com erro
             if os.path.exists('input.txt'):
-                os.remove('input.txt')
+                try:
+                    os.remove('input.txt')
+                except:
+                    pass
 
-def main():
-    """Loop principal que monitora input.txt"""
+# Instância global
+_handler = None
+
+def get_handler():
+    """Retorna instância singleton do handler"""
+    global _handler
+    if _handler is None:
+        _handler = OllamaHandler()
+    return _handler
+
+def start_handler():
+    """Inicia o handler"""
+    get_handler().start()
+
+def stop_handler():
+    """Para o handler"""
+    if _handler:
+        _handler.stop()
+
+if __name__ == "__main__":
     print("="*60)
-    print("🚀 Ollama Handler iniciado...")
+    print("🚀 Ollama Handler (standalone test) iniciado...")
     print("="*60)
     print(f"✓ Ollama disponível: {OLLAMA_AVAILABLE}")
     print(f"✓ Monitorando: input.txt")
     print(f"✓ Escrevendo em: response.txt")
-    print(f"✓ Intervalo de verificação: 500ms")
+    print(f"✓ Intervalo de verificação: 100ms")
     print("="*60)
-    print("\n⏳ Aguardando mensagens...\n")
+    print("\n⏳ Aguardando mensagens... (Crie input.txt para testar)\n")
     
-    while True:
-        try:
-            process_message()
-            time.sleep(0.5)  # Verifica a cada 500ms
-        except KeyboardInterrupt:
-            print("\n\n" + "="*60)
-            print("👋 Ollama Handler encerrado.")
-            print("="*60)
-            break
-        except Exception as e:
-            print(f"❌ Erro no loop principal: {e}")
-            time.sleep(1)
-
-if __name__ == "__main__":
-    main()
-
+    start_handler()
+    
+    try:
+        while True:
+            time.sleep(1) # Mantém o programa principal rodando
+    except KeyboardInterrupt:
+        print("\n\n" + "="*60)
+        print("👋 Ollama Handler (standalone test) encerrado.")
+        print("="*60)
+    finally:
+        stop_handler()

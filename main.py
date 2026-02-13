@@ -8,8 +8,16 @@ import ui
 import game_clock
 import map_system
 from auto_talk import get_auto_talk_system
+from ollama_handler import start_handler, stop_handler
+import atexit
+
 # Inicialização
 pygame.init()
+
+# Inicia Ollama handler em background
+start_handler()
+# Registra função para parar handler ao sair
+atexit.register(stop_handler)
 
 # Carrega Configuração
 DEFS, DICT = config.load_config()
