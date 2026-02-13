@@ -1,4 +1,38 @@
 {
+    "voice_map": {
+        "en": {
+            "male": "US-GuyNeural",
+            "female": "US-AriaNeural"
+        },
+        "pt": {
+            "male": "BR-AntonioNeural",
+            "female": "BR-FranciscaNeural"
+        },
+        "es": {
+            "male": "ES-AlvaroNeural",
+            "female": "ES-ElviraNeural"
+        },
+        "fr": {
+            "male": "FR-HenriNeural",
+            "female": "FR-DeniseNeural"
+        },
+        "de": {
+            "male": "DE-ConradNeural",
+            "female": "DE-KatjaNeural"
+        },
+        "it": {
+            "male": "IT-DiegoNeural",
+            "female": "IT-ElsaNeural"
+        },
+        "ja": {
+            "male": "JP-KeitaNeural",
+            "female": "JP-NanamiNeural"
+        },
+        "zh": {
+            "male": "CN-YunxiNeural",
+            "female": "CN-XiaoxiaoNeural"
+        }
+    },
     "format": {
         "subtitle": {
             "background": false,
@@ -11,7 +45,7 @@
                         "response_text": {
                             "text": "!teevee_response",
                             "height_percent": 0.7,
-                            "font_size_percent": 0.04,
+                            "font_size_percent": 0.02,
                             "background": false
                         },
                         "pagination": {
@@ -738,11 +772,526 @@
             "format": "config"
         }
     },
-    "lines": {
-        "eng": [
-            "Good +time!",
-            "Lovely +time we`re having!",
-            "What a +time we`re having!"
-        ]
+    "converters": {
+        "+time": {
+            "type": "time_of_day",
+            "values": {
+                "morning": [
+                    5,
+                    12
+                ],
+                "afternoon": [
+                    12,
+                    18
+                ],
+                "evening": [
+                    18,
+                    24
+                ],
+                "night": [
+                    0,
+                    5
+                ]
+            }
+        },
+        "+date": {
+            "type": "current_date",
+            "format": "%B %d"
+        },
+        "+day": {
+            "type": "current_date",
+            "format": "%A"
+        },
+        "+weather": {
+            "type": "weather_condition"
+        },
+        "+temp": {
+            "type": "temperature"
+        },
+        "+city": {
+            "type": "location_city"
+        }
+    },
+    "translations": {
+        "en": {
+            "days": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ],
+            "days_short": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
+            "months": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ],
+            "months_short": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+            ],
+            "time_of_day": {
+                "morning": "morning",
+                "afternoon": "afternoon",
+                "evening": "evening",
+                "night": "night"
+            },
+            "weather": {
+                "sunny": "sunny",
+                "cloudy": "cloudy",
+                "rainy": "rainy",
+                "partly cloudy": "partly cloudy"
+            }
+        },
+        "pt": {
+            "days": [
+                "Segunda-feira",
+                "Terça-feira",
+                "Quarta-feira",
+                "Quinta-feira",
+                "Sexta-feira",
+                "Sábado",
+                "Domingo"
+            ],
+            "days_short": [
+                "Seg",
+                "Ter",
+                "Qua",
+                "Qui",
+                "Sex",
+                "Sáb",
+                "Dom"
+            ],
+            "months": [
+                "Janeiro",
+                "Fevereiro",
+                "Março",
+                "Abril",
+                "Maio",
+                "Junho",
+                "Julho",
+                "Agosto",
+                "Setembro",
+                "Outubro",
+                "Novembro",
+                "Dezembro"
+            ],
+            "months_short": [
+                "Jan",
+                "Fev",
+                "Mar",
+                "Abr",
+                "Mai",
+                "Jun",
+                "Jul",
+                "Ago",
+                "Set",
+                "Out",
+                "Nov",
+                "Dez"
+            ],
+            "time_of_day": {
+                "morning": "manhã",
+                "afternoon": "tarde",
+                "evening": "noite",
+                "night": "madrugada"
+            },
+            "weather": {
+                "sunny": "ensolarado",
+                "cloudy": "nublado",
+                "rainy": "chuvoso",
+                "partly cloudy": "parcialmente nublado"
+            }
+        },
+        "es": {
+            "days": [
+                "Lunes",
+                "Martes",
+                "Miércoles",
+                "Jueves",
+                "Viernes",
+                "Sábado",
+                "Domingo"
+            ],
+            "days_short": [
+                "Lun",
+                "Mar",
+                "Mié",
+                "Jue",
+                "Vie",
+                "Sáb",
+                "Dom"
+            ],
+            "months": [
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+            ],
+            "months_short": [
+                "Ene",
+                "Feb",
+                "Mar",
+                "Abr",
+                "May",
+                "Jun",
+                "Jul",
+                "Ago",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dic"
+            ],
+            "time_of_day": {
+                "morning": "mañana",
+                "afternoon": "tarde",
+                "evening": "noche",
+                "night": "madrugada"
+            },
+            "weather": {
+                "sunny": "soleado",
+                "cloudy": "nublado",
+                "rainy": "lluvioso",
+                "partly cloudy": "parcialmente nublado"
+            }
+        },
+        "fr": {
+            "days": [
+                "Lundi",
+                "Mardi",
+                "Mercredi",
+                "Jeudi",
+                "Vendredi",
+                "Samedi",
+                "Dimanche"
+            ],
+            "days_short": [
+                "Lun",
+                "Mar",
+                "Mer",
+                "Jeu",
+                "Ven",
+                "Sam",
+                "Dim"
+            ],
+            "months": [
+                "Janvier",
+                "Février",
+                "Mars",
+                "Avril",
+                "Mai",
+                "Juin",
+                "Juillet",
+                "Août",
+                "Septembre",
+                "Octobre",
+                "Novembre",
+                "Décembre"
+            ],
+            "months_short": [
+                "Jan",
+                "Fév",
+                "Mar",
+                "Avr",
+                "Mai",
+                "Jun",
+                "Jui",
+                "Aoû",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Déc"
+            ],
+            "time_of_day": {
+                "morning": "matin",
+                "afternoon": "après-midi",
+                "evening": "soir",
+                "night": "nuit"
+            },
+            "weather": {
+                "sunny": "ensoleillé",
+                "cloudy": "nuageux",
+                "rainy": "pluvieux",
+                "partly cloudy": "partiellement nuageux"
+            }
+        },
+        "de": {
+            "days": [
+                "Montag",
+                "Dienstag",
+                "Mittwoch",
+                "Donnerstag",
+                "Freitag",
+                "Samstag",
+                "Sonntag"
+            ],
+            "days_short": [
+                "Mo",
+                "Di",
+                "Mi",
+                "Do",
+                "Fr",
+                "Sa",
+                "So"
+            ],
+            "months": [
+                "Januar",
+                "Februar",
+                "März",
+                "April",
+                "Mai",
+                "Juni",
+                "Juli",
+                "August",
+                "September",
+                "Oktober",
+                "November",
+                "Dezember"
+            ],
+            "months_short": [
+                "Jan",
+                "Feb",
+                "Mär",
+                "Apr",
+                "Mai",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Okt",
+                "Nov",
+                "Dez"
+            ],
+            "time_of_day": {
+                "morning": "Morgen",
+                "afternoon": "Nachmittag",
+                "evening": "Abend",
+                "night": "Nacht"
+            },
+            "weather": {
+                "sunny": "sonnig",
+                "cloudy": "bewölkt",
+                "rainy": "regnerisch",
+                "partly cloudy": "teilweise bewölkt"
+            }
+        },
+        "it": {
+            "days": [
+                "Lunedì",
+                "Martedì",
+                "Mercoledì",
+                "Giovedì",
+                "Venerdì",
+                "Sabato",
+                "Domenica"
+            ],
+            "days_short": [
+                "Lun",
+                "Mar",
+                "Mer",
+                "Gio",
+                "Ven",
+                "Sab",
+                "Dom"
+            ],
+            "months": [
+                "Gennaio",
+                "Febbraio",
+                "Marzo",
+                "Aprile",
+                "Maggio",
+                "Giugno",
+                "Luglio",
+                "Agosto",
+                "Settembre",
+                "Ottobre",
+                "Novembre",
+                "Dicembre"
+            ],
+            "months_short": [
+                "Gen",
+                "Feb",
+                "Mar",
+                "Apr",
+                "Mag",
+                "Giu",
+                "Lug",
+                "Ago",
+                "Set",
+                "Ott",
+                "Nov",
+                "Dic"
+            ],
+            "time_of_day": {
+                "morning": "mattina",
+                "afternoon": "pomeriggio",
+                "evening": "sera",
+                "night": "notte"
+            },
+            "weather": {
+                "sunny": "soleggiato",
+                "cloudy": "nuvoloso",
+                "rainy": "piovoso",
+                "partly cloudy": "parzialmente nuvoloso"
+            }
+        },
+        "ja": {
+            "days": [
+                "月曜日",
+                "火曜日",
+                "水曜日",
+                "木曜日",
+                "金曜日",
+                "土曜日",
+                "日曜日"
+            ],
+            "days_short": [
+                "月",
+                "火",
+                "水",
+                "木",
+                "金",
+                "土",
+                "日"
+            ],
+            "months": [
+                "1月",
+                "2月",
+                "3月",
+                "4月",
+                "5月",
+                "6月",
+                "7月",
+                "8月",
+                "9月",
+                "10月",
+                "11月",
+                "12月"
+            ],
+            "months_short": [
+                "1月",
+                "2月",
+                "3月",
+                "4月",
+                "5月",
+                "6月",
+                "7月",
+                "8月",
+                "9月",
+                "10月",
+                "11月",
+                "12月"
+            ],
+            "time_of_day": {
+                "morning": "朝",
+                "afternoon": "午後",
+                "evening": "夕方",
+                "night": "夜"
+            },
+            "weather": {
+                "sunny": "晴れ",
+                "cloudy": "曇り",
+                "rainy": "雨",
+                "partly cloudy": "晴れ時々曇り"
+            }
+        },
+        "zh": {
+            "days": [
+                "星期一",
+                "星期二",
+                "星期三",
+                "星期四",
+                "星期五",
+                "星期六",
+                "星期日"
+            ],
+            "days_short": [
+                "周一",
+                "周二",
+                "周三",
+                "周四",
+                "周五",
+                "周六",
+                "周日"
+            ],
+            "months": [
+                "一月",
+                "二月",
+                "三月",
+                "四月",
+                "五月",
+                "六月",
+                "七月",
+                "八月",
+                "九月",
+                "十月",
+                "十一月",
+                "十二月"
+            ],
+            "months_short": [
+                "1月",
+                "2月",
+                "3月",
+                "4月",
+                "5月",
+                "6月",
+                "7月",
+                "8月",
+                "9月",
+                "10月",
+                "11月",
+                "12月"
+            ],
+            "time_of_day": {
+                "morning": "早上",
+                "afternoon": "下午",
+                "evening": "晚上",
+                "night": "深夜"
+            },
+            "weather": {
+                "sunny": "晴朗",
+                "cloudy": "多云",
+                "rainy": "下雨",
+                "partly cloudy": "局部多云"
+            }
+        }
     }
 }

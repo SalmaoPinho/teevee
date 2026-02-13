@@ -12,6 +12,14 @@ def getVars(name):
         key: int(value) for key, value in definitions.items('VARIABLES')
     }
     return vars[name]
+
+def get_user_name():
+    """Retorna o nome do usuário da seção [USER]"""
+    try:
+        return definitions.get('USER', 'name', fallback='User')
+    except:
+        return 'User'
+
 def setVars(name, value,operate=False):
     if operate:
         current_value = getVars(name)
@@ -34,7 +42,7 @@ def load_config():
         key: definitions.getboolean('TOGGLE', key) for key in definitions['TOGGLE']
     })
 
-    with open("dictionary.json", "r") as f:
+    with open("dictionary.json", "r", encoding='utf-8') as f:
         DICT.clear()
         DICT.update(json.load(f))
     

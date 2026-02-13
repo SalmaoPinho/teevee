@@ -1,0 +1,36 @@
+# TeeVee - Arquivos ignorados pelo Git
+
+# Ambiente e configuração
+.env
+*.env
+
+# Cache de localização (migrado para .env)
+location_cache.json
+
+# Cache de áudio TTS
+assets/sounds/tts_cache/
+
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Ambientes virtuais
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

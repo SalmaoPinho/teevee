@@ -1,5 +1,6 @@
 import pygame
 from config import DEFS
+from voice_tts import get_tts_engine
 
 SCREEN = None
 SHEET = None
@@ -250,6 +251,11 @@ class TeeVee:
         self.frame_offset_y = 0  # Offset vertical para movimento do frame
         self.letter_duration = 100  # Milissegundos por letra
         
+        # Sistema TTS
+        self.tts_engine = get_tts_engine()
+        self.tts_sound = None  # Som TTS atual
+        self.tts_channel = None  # Canal de áudio para TTS
+        
         # Sistema de movimento dos olhos (segue o mouse)
         self.eye_offset_x = 0  # Offset horizontal dos olhos (-1, 0, 1)
         self.eye_offset_y = 0  # Offset vertical dos olhos (-1, 0, 1)
@@ -262,12 +268,31 @@ class TeeVee:
         self.movement_threshold = 10  # Número de movimentos rápidos para ficar tonto (reduzido de 15)
         
     def start_talking(self, text):
-        """Inicia a animação de fala com o texto fornecido"""
+        """Inicia a animação de fala com TTS"""
         self.is_talking = True
         self.talk_text = text
         self.talk_index = 0
         self.talk_timer = pygame.time.get_ticks()
+        self.talk_start_time = pygame.time.get_ticks()  # Marca início da fala
+        self.talk_duration_ms = 0  # Duração do áudio em ms
         self.mouth = "mouth_open"
+        
+        # Gera e toca TTS
+        audio_path = self.tts_engine.generate_speech(text)
+        if audio_path:
+            try:
+                self.tts_sound = pygame.mixer.Sound(audio_path)
+                self.tts_channel = self.tts_sound.play()
+                
+                # Obtém duração real do áudio em milissegundos
+                audio_duration_sec = self.tts_engine.get_audio_duration(audio_path)
+                self.talk_duration_ms = int(audio_duration_sec * 1000)
+                
+                # Ajusta letter_duration baseado na duração do áudio
+                if len(text) > 0:
+                    self.letter_duration = max(50, audio_duration_sec // len(text))
+            except Exception as e:
+                print(f"[TTS] Erro ao tocar áudio: {e}")
         
     def update(self):
         """Atualiza a animação de fala e movimento dos olhos"""
@@ -275,8 +300,15 @@ class TeeVee:
         if self.is_talking:
             current_time = pygame.time.get_ticks()
             elapsed = current_time - self.talk_timer
+            elapsed_total = current_time - self.talk_start_time
             
-            if elapsed >= self.letter_duration:
+            # Para a animação quando o áudio terminar
+            if self.talk_duration_ms > 0 and elapsed_total >= self.talk_duration_ms:
+                self.is_talking = False
+                self.mouth_open = False
+                self.frame_offset_y = 0
+                self.mouth = "mouth_smile"
+            elif elapsed >= self.letter_duration:
                 self.talk_timer = current_time
                 self.talk_index += 1
                 
@@ -286,12 +318,6 @@ class TeeVee:
                     self.frame_offset_y = -2
                 else:
                     self.frame_offset_y = 2
-                
-                if self.talk_index >= len(self.talk_text):
-                    self.is_talking = False
-                    self.mouth_open = False
-                    self.frame_offset_y = 0
-                    self.mouth = "mouth_smile"
         else:
             self.frame_offset_y = 0
         
@@ -415,8 +441,7 @@ class TeeVee:
             # Adiciona offset de animação
             mouth_y += self.frame_offset_y / 1000.0
             self.mouth="mouth_midopen" if self.mouth_open else "mouth_open"
-            if not self.mouth_open:           
-                GLOCK.player.play_sound("talk")
+            # TTS já está tocando, não precisa do som "talk"
 
         SPRITE_LOADER.draw_sprite_centered(self.mouth, center_x, mouth_y)
         

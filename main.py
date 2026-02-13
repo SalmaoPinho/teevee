@@ -1,3 +1,4 @@
+from matplotlib import text
 import pygame
 import sys
 import os
@@ -6,7 +7,7 @@ import graphics
 import ui
 import game_clock
 import map_system
-
+from auto_talk import get_auto_talk_system
 # Inicialização
 pygame.init()
 
@@ -36,18 +37,19 @@ global TV
 TV = graphics.TeeVee()
 ui.set_tv(TV)
 
-# Saudação inicial baseada no horário
-import datetime
-hour = datetime.datetime.now().hour
-if 5 <= hour < 12:
-    greeting = "Olá, bom dia!"
-elif 12 <= hour < 18:
-    greeting = "Olá, boa tarde!"
-else:
-    greeting = "Olá, boa noite!"
+# Inicializa sistema de auto-talk
+from auto_talk import get_auto_talk_system
+auto_talk = get_auto_talk_system(interval_seconds=120)
 
-ui.chat_response = greeting  # Exibe no chat
-TV.start_talking(greeting)   # TeeVee fala
+# Gera greeting inicial usando auto_talk
+initial_greeting = auto_talk.generate_talk()
+if initial_greeting:
+    greeting = initial_greeting['text']
+else:
+    greeting = "Hello! Welcome back!"
+
+# Aguarda para falar após primeira renderização
+greeting_pending = True
 
 crt = graphics.apply_crt_effect()
 buttons = ui.clickable_elements()
@@ -168,6 +170,9 @@ while running:
                         TV.mouth="mouth_skeptic"
                         ui.chat_input = ""
                         ui.waiting_for_response = True
+                        
+                        # Reinicia timer do auto-talk
+                        auto_talk.reset_timer()
                     ui.chat_input_active = False
                 elif event.key == pygame.K_BACKSPACE:
                     ui.chat_input = ui.chat_input[:-1]
@@ -176,7 +181,10 @@ while running:
         elif event.type == pygame.TEXTINPUT and ui.chat_input_active:
             # Adiciona caractere digitado
             ui.chat_input += event.text
-    
+    talk=auto_talk.update()
+    if talk:
+        TV.start_talking(talk["text"])
+        ui.chat_response = talk["text"]
     # Verifica se há resposta do Ollama
     if ui.waiting_for_response and os.path.exists('response.txt'):
         try:
@@ -203,6 +211,21 @@ while running:
     userint = ui.render_ui(SCREEN)   
     GAME_CLOCK.update()
     TV.update()  # Atualiza animação de fala do TeeVee
+    
+    # Fala greeting após primeira renderização
+    if greeting_pending:
+        ui.chat_response = greeting
+        TV.start_talking(greeting)
+        greeting_pending = False
+        # Reinicia timer para esperar cooldown completo
+        auto_talk.reset_timer()
+    
+    # Atualiza sistema de auto-talk (gera falas automáticas)
+    auto_talk_result = auto_talk.update()
+    if auto_talk_result:
+        ui.chat_response = auto_talk_result['text']
+        TV.start_talking(auto_talk_result['text'])
+    
     # Desenha a TV    
     if DEFS['crt']:
             SCREEN.blit(crt, (0, 0))    

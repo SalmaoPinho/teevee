@@ -596,6 +596,10 @@ class UElement:
                         val=GAME_CLOCK.vals[command]
                     elif GAME_CLOCK and (command in GAME_CLOCK.info):
                         val=str(GAME_CLOCK.info[command])
+                        # Traduz weather_cond se for esse comando
+                        if command == 'weather_cond':
+                            from translations import translate_weather
+                            val = translate_weather(val)
                     elif GAME_CLOCK and (command in GAME_CLOCK.player.metadata):
                         val=str(GAME_CLOCK.player.metadata[command])
                     if val != "":
